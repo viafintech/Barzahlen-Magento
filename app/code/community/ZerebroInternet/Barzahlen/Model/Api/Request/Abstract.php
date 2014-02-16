@@ -27,7 +27,7 @@ abstract class ZerebroInternet_Barzahlen_Model_Api_Request_Abstract extends Zere
   protected $_xmlAttributes = array(); //!< expected xml nodes
   protected $_xmlData = array(); //!< array with parsed xml data
 
-  abstract public function buildRequestArray($shopId, $language, array $customVar, $paymentKey);
+  abstract public function buildRequestArray($shopId, $paymentKey, $language);
 
   /**
    * Returns request type.

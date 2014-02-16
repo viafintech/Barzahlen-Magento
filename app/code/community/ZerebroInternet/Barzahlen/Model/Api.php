@@ -23,7 +23,6 @@ class ZerebroInternet_Barzahlen_Model_Api extends ZerebroInternet_Barzahlen_Mode
 
   protected $_shopId; //!< merchants shop id
   protected $_paymentKey; //!< merchants payment key
-  protected $_customVar = array('', '', ''); //!< custom variables
   protected $_language = 'de'; //!< langauge code
   protected $_sandbox = false; //!< sandbox settings
   protected $_madeAttempts = 0; //!< performed attempts
@@ -38,20 +37,6 @@ class ZerebroInternet_Barzahlen_Model_Api extends ZerebroInternet_Barzahlen_Mode
     $this->_shopId = $arguements['shopId'];
     $this->_paymentKey = $arguements['paymentKey'];
     $this->_sandbox = $arguements['sandbox'];
-  }
-
-  /**
-   * Lets the merchant sets custom variables.
-   *
-   * @param string $var0 First Custom Variable
-   * @param string $var1 Second Custom Variable
-   * @param string $var2 Third Custom Variable
-   */
-  public function setCustomVar($var0 = '', $var1 = '', $var2 = '') {
-
-    $this->_customVar[0] = $var0;
-    $this->_customVar[1] = $var1;
-    $this->_customVar[2] = $var2;
   }
 
   /**
@@ -71,7 +56,7 @@ class ZerebroInternet_Barzahlen_Model_Api extends ZerebroInternet_Barzahlen_Mode
    */
   public function handleRequest($request) {
 
-    $requestArray = $request->buildRequestArray($this->_shopId, $this->_language, $this->_customVar, $this->_paymentKey);
+    $requestArray = $request->buildRequestArray($this->_shopId, $this->_paymentKey, $this->_language);
     $this->_debug("API: Sending request array to Barzahlen.", $requestArray);
     $xmlResponse = $this->_connectToApi($requestArray, $request->getRequestType());
     $this->_debug("API: Received XML response from Barzahlen.", $xmlResponse);

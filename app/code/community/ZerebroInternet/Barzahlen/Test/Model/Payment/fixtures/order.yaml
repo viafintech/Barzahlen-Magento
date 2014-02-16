@@ -80,3 +80,11 @@ tables:
       qty_ordered: 6
       qty_refunded: 0
       qty_shipped: 0
+  sales/order_address:
+    - item: 10
+      parent_id: 10
+      address_type: billing
+      street: Musterstr. 1a
+      postcode: 12345
+      city: Musterstadt
+      country_id: DE

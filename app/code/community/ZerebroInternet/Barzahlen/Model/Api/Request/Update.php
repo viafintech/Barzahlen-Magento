@@ -19,12 +19,13 @@
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL-3.0)
  */
 
-class ZerebroInternet_Barzahlen_Model_Api_Request_Resend extends ZerebroInternet_Barzahlen_Model_Api_Request_Abstract {
+class ZerebroInternet_Barzahlen_Model_Api_Request_Update extends ZerebroInternet_Barzahlen_Model_Api_Request_Abstract {
 
-  protected $_type = 'resend_email'; //!< request type
+  protected $_type = 'update'; //!< request type
   protected $_transactionId; //!< origin transaction id
+  protected $_orderId; //!< order id
 
-  protected $_xmlAttributes = array('transaction-id', 'result', 'hash'); //!< resend xml content
+  protected $_xmlAttributes = array('transaction-id', 'result', 'hash'); //!< update xml content
 
   /**
    * Construtor to set variable request settings. Adjusted for Magento
@@ -34,6 +35,7 @@ class ZerebroInternet_Barzahlen_Model_Api_Request_Resend extends ZerebroInternet
   public function __construct(array $arguments) {
 
     $this->_transactionId = $arguments['transactionId'];
+    $this->_orderId = $arguments['orderId'];
   }
 
   /**
@@ -43,14 +45,14 @@ class ZerebroInternet_Barzahlen_Model_Api_Request_Resend extends ZerebroInternet
    * @param string $paymentKey merchants payment key
    * @param string $language langauge code (ISO 639-1)
    * @param array $customVar custom variables from merchant
-   * @return array for resend request
+   * @return array for update request
    */
   public function buildRequestArray($shopId, $paymentKey, $language) {
 
     $requestArray = array();
     $requestArray['shop_id'] = $shopId;
     $requestArray['transaction_id'] = $this->_transactionId;
-    $requestArray['language'] = $language;
+    $requestArray['order_id'] = $this->_orderId;
     $requestArray['hash'] = $this->_createHash($requestArray, $paymentKey);
 
     $this->_removeEmptyValues($requestArray);

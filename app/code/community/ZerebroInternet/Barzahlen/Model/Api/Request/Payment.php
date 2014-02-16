@@ -23,9 +23,14 @@ class ZerebroInternet_Barzahlen_Model_Api_Request_Payment extends ZerebroInterne
 
   protected $_type = 'create'; //!< request type
   protected $_customerEmail; //!< customers e-mail address
+  protected $_customerStreetNr; //!< customers street and street number
+  protected $_customerZipcode; //!< customers zipcode
+  protected $_customerCity; //!< customers city
+  protected $_customerCountry; //!< customers country
   protected $_orderId; //!< order id
   protected $_amount; //!< payment amount
   protected $_currency; //!< currency of payment (ISO 4217)
+  protected $_customVar = array('', '', ''); //!< custom variables
 
   protected $_xmlAttributes = array('transaction-id', 'payment-slip-link', 'expiration-notice',
                                     'infotext-1', 'infotext-2', 'result', 'hash'); //!< payment xml content
@@ -38,21 +43,39 @@ class ZerebroInternet_Barzahlen_Model_Api_Request_Payment extends ZerebroInterne
   public function __construct(array $arguments) {
 
     $this->_customerEmail = $arguments['customerEmail'];
-    $this->_orderId = $arguments['orderId'];
+    $this->_customerStreetNr = $arguments['customerStreetNr'];
+    $this->_customerZipcode = $arguments['customerZipcode'];
+    $this->_customerCity = $arguments['customerCity'];
+    $this->_customerCountry = $arguments['customerCountry'];
     $this->_amount = $arguments['amount'];
     $this->_currency = $arguments['currency'];
+    $this->_orderId = $arguments['orderId'];
+  }
+
+  /**
+   * Lets the merchant sets custom variables.
+   *
+   * @param string $var0 First Custom Variable
+   * @param string $var1 Second Custom Variable
+   * @param string $var2 Third Custom Variable
+   */
+  public function setCustomVar($var0 = '', $var1 = '', $var2 = '') {
+
+    $this->_customVar[0] = $var0;
+    $this->_customVar[1] = $var1;
+    $this->_customVar[2] = $var2;
   }
 
   /**
    * Builds array for request.
    *
    * @param string $shopId merchants shop id
+   * @param string $paymentKey merchants payment key
    * @param string $language langauge code (ISO 639-1)
    * @param array $customVar custom variables from merchant
-   * @param string $paymentKey merchants payment key
    * @return array for payment request
    */
-  public function buildRequestArray($shopId, $language, array $customVar, $paymentKey) {
+  public function buildRequestArray($shopId, $paymentKey, $language) {
 
     $requestArray = array();
     $requestArray['shop_id'] = $shopId;
@@ -61,11 +84,16 @@ class ZerebroInternet_Barzahlen_Model_Api_Request_Payment extends ZerebroInterne
     $requestArray['currency'] = $this->_currency;
     $requestArray['language'] = $language;
     $requestArray['order_id'] = $this->_orderId;
-    $requestArray['custom_var_0'] = $customVar[0];
-    $requestArray['custom_var_1'] = $customVar[1];
-    $requestArray['custom_var_2'] = $customVar[2];
+    $requestArray['customer_street_nr'] = $this->_customerStreetNr;
+    $requestArray['customer_zipcode'] = $this->_customerZipcode;
+    $requestArray['customer_city'] = $this->_customerCity;
+    $requestArray['customer_country'] = $this->_customerCountry;
+    $requestArray['custom_var_0'] = $this->_customVar[0];
+    $requestArray['custom_var_1'] = $this->_customVar[1];
+    $requestArray['custom_var_2'] = $this->_customVar[2];
     $requestArray['hash'] = $this->_createHash($requestArray, $paymentKey);
 
+    $this->_removeEmptyValues($requestArray);
     return $requestArray;
   }
 

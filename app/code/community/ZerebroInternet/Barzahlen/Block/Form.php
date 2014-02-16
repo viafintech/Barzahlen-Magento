@@ -23,17 +23,15 @@
 class ZerebroInternet_Barzahlen_Block_Form extends Mage_Payment_Block_Form {
 
   protected function _construct() {
-    // create the Form Block (Checkout Onepage Sidebar) and assign the template to it
+    // create the Form Block (Checkout Onepage) and assign the template to it
 
-    $locale = Mage::app()->getLocale();
     $mark = Mage::getConfig()->getBlockClassName('core/template');
     $mark = new $mark;
-    $mark->setTemplate('barzahlen/mark.phtml')
-         ->setPaymentAcceptanceMarkHref('http://www.barzahlen.de');
+    $mark->setTemplate('barzahlen/mark.phtml');
     $this->setTemplate('barzahlen/form.phtml')
          ->setMethodTitle('')
-         ->setMethodLabelAfterHtml($mark->toHtml())
-    ;
+         ->setMethodLabelAfterHtml($mark->toHtml());
+    
     return parent::_construct();
   }
 }

@@ -65,14 +65,6 @@ class ZerebroInternet_Barzahlen_Model_Barzahlen extends Mage_Payment_Model_Metho
     $paymentKey = $this->getConfigData('payment_key');
     $sandbox = $this->getConfigData('sandbox');
     $barzahlenApi = Mage::getModel('barzahlen/api', array('shopId' => $shopId, 'paymentKey' => $paymentKey, 'sandbox' => $sandbox));
-
-    // filter the 3 custom vars and escape them for HTML compliance
-    $tcHelper = Mage::getModel('core/email_template_filter');
-    $customVar0 = $tcHelper->filter($this->getConfigData('custom_var_0'));
-    $customVar1 = $tcHelper->filter($this->getConfigData('custom_var_1'));
-    $customVar2 = $tcHelper->filter($this->getConfigData('custom_var_2'));
-    $barzahlenApi->setCustomVar($customVar0, $customVar1, $customVar2);
-
     $barzahlenApi->setLanguage(substr((Mage::getSingleton('core/locale')->getLocaleCode()),0,2));
 
     if($this->getConfigData('debug')) {

@@ -34,11 +34,25 @@ class ZerebroInternet_Barzahlen_Model_Payment extends ZerebroInternet_Barzahlen_
       return;
     }
 
+    $orderAddress = $order->getBillingAddress();
     $customerEmail = $order->getCustomerEmail();
-    $amount   =Mage::getSingleton('core/store')->roundPrice($order->getGrandTotal(), 2);
+    $customerStreetNr = $orderAddress->getData("street");
+    $customerZipcode = $orderAddress->getData("postcode");
+    $customerCity = $orderAddress->getData("city");
+    $customerCountry = $orderAddress->getData("country_id");
+    $amount = Mage::getSingleton('core/store')->roundPrice($order->getGrandTotal(), 2);
     $currency = $order->getOrderCurrencyCode();
     $payment = Mage::getModel('barzahlen/api_request_payment',
-      array('customerEmail' => $customerEmail, 'orderId' => $orderId, 'amount' => $amount, 'currency' => $currency));
+      array('customerEmail' => $customerEmail, 'customerStreetNr' => $customerStreetNr,
+            'customerZipcode' => $customerZipcode, 'customerCity' => $customerCity,
+            'customerCountry' => $customerCountry, 'orderId' => $orderId, 'amount' => $amount, 'currency' => $currency));
+
+    // filter the 3 custom vars and escape them for HTML compliance
+    $tcHelper = Mage::getModel('core/email_template_filter');
+    $customVar0 = $tcHelper->filter($this->getConfigData('custom_var_0'));
+    $customVar1 = $tcHelper->filter($this->getConfigData('custom_var_1'));
+    $customVar2 = $tcHelper->filter($this->getConfigData('custom_var_2'));
+    $payment->setCustomVar($customVar0, $customVar1, $customVar2);
 
     try {
       Mage::getSingleton('barzahlen/barzahlen')->getBarzahlenApi()->handleRequest($payment);

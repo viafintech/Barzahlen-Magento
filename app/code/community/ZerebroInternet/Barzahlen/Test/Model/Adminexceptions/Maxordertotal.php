@@ -25,7 +25,7 @@ class ZerebroInternet_Barzahlen_Test_Model_Adminexceptions_Maxordertotal extends
 
     $this->object->setValue('2500');
     $this->object->save();
-    $this->assertEquals('1000', $this->object->getValue());
+    $this->assertEquals('999.99', $this->object->getValue());
   }
 
   /**
@@ -51,7 +51,7 @@ class ZerebroInternet_Barzahlen_Test_Model_Adminexceptions_Maxordertotal extends
 
     $this->object->setValue('-200');
     $this->object->save();
-    $this->assertEquals('1000', $this->object->getValue());
+    $this->assertEquals('999.99', $this->object->getValue());
   }
 
   /**

@@ -34,10 +34,9 @@ class ZerebroInternet_Barzahlen_Model_Adminexceptions_Title extends Mage_Core_Mo
 
     if (strlen($title) < 1) {
       $translateMessage = Mage::helper('barzahlen')->__('bz_adm_co_exception');
-      $translateTitle = Mage::helper('barzahlen')->__('Barzahlen (Pay Cash Online)');
       Mage::getSingleton('adminhtml/session')->addError($translateMessage);
       Mage::helper('barzahlen')->bzLog('adminexceptions/title: Empty string given. Setting default title.');
-      $this->setValue($translateTitle);
+      $this->setValue('Barzahlen');
     }
 
     return parent::save();

@@ -25,7 +25,7 @@ class ZerebroInternet_Barzahlen_Test_Model_Adminexceptions_Title extends EcomDev
 
     $this->object->setValue('');
     $this->object->save();
-    $this->assertEquals('Barzahlen (Pay Cash Online)', $this->object->getValue());
+    $this->assertEquals('Barzahlen', $this->object->getValue());
   }
 
   /**

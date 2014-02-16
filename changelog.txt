@@ -1,2 +1,7 @@
+==1.1.0 (31.10.2012)==
+* implemented new api geocoding feature to get the closest points of sales
+* reduced the maximum amount to 999.99 Euros
+* small changes in the language files
+
 ==1.0.0 (26.09.2012)==
 * initial release

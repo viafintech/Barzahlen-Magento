@@ -25,7 +25,7 @@
 
   <modules>
     <ZerebroInternet_Barzahlen>
-      <version>1.0.0</version>
+      <version>1.1.0</version>
     </ZerebroInternet_Barzahlen>
   </modules>
 
@@ -136,7 +136,7 @@
         <order_status>pending</order_status>
         <allowspecific>1</allowspecific>
         <specificcountry>DE</specificcountry>
-        <max_order_total>1000</max_order_total>
+        <max_order_total>999.99</max_order_total>
         <sort_order>-1</sort_order>
       </barzahlen>
     </payment>
