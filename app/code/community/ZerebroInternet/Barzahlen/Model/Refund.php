@@ -32,7 +32,15 @@ class ZerebroInternet_Barzahlen_Model_Refund extends Mage_Core_Model_Abstract {
 
     $creditmemo = $observer->getEvent()->getcreditmemo();
     $order = $creditmemo->getOrder();
-    $this->_checkOrderSettings($order);
+
+    if(!$order->getId()) {
+      Mage::helper('barzahlen')->bzLog('model/refund: no valid order choosen');
+      Mage::throwException(Mage::helper('barzahlen')->__('bz_adm_refund_error'));
+    }
+
+    if($order->getPayment()->getMethod() != ZerebroInternet_Barzahlen_Model_Barzahlen::PAYMENT_CODE) {
+      return $observer;
+    }
 
     $transactionId = $order->getPayment()->getAdditionalInformation('transaction_id');
     $amount = round($creditmemo->getGrandTotal(),2);
@@ -62,23 +70,5 @@ class ZerebroInternet_Barzahlen_Model_Refund extends Mage_Core_Model_Abstract {
     }
 
     return $observer;
-  }
-
-  /**
-   * Checks that the order exists and was paid with Barzahlen.
-   *
-   * @param Mage_Sales_Model_Order $order
-   */
-  protected function _checkOrderSettings($order) {
-
-    if(!$order->getId()) {
-      Mage::helper('barzahlen')->bzLog('model/refund: no valid order choosen');
-      Mage::throwException(Mage::helper('barzahlen')->__('bz_adm_refund_error'));
-    }
-
-    if($order->getPayment()->getMethod() != ZerebroInternet_Barzahlen_Model_Barzahlen::PAYMENT_CODE) {
-      Mage::helper('barzahlen')->bzLog('model/refund: barzahlen was not the former choosen payment method');
-      Mage::throwException(Mage::helper('barzahlen')->__('bz_adm_refund_error'));
-    }
   }
 }

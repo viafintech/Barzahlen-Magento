@@ -189,7 +189,6 @@ class ZerebroInternet_Barzahlen_Test_Model_Refund extends EcomDev_PHPUnit_Test_C
    *
    * @test
    * @loadFixture order_paypal
-   * @expectedException Mage_Core_Exception
    */
   public function testRefundObserverWithOtherPaymentMethod() {
 
