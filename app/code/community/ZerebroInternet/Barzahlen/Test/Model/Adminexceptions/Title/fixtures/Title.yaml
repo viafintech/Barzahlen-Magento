@@ -1,0 +1,15 @@
+config:
+  default/payment/barzahlen/title: Barzahlen (Pay Cash Online)
+  default/payment/barzahlen/sandbox: 0
+  default/payment/barzahlen/sort_order: 1
+  default/payment/barzahlen/active: 1
+  default/payment/barzahlen/debug: 1
+  default/payment/barzahlen/allowspecific: 1
+  default/payment/barzahlen/specificcountry: DE
+  default/payment/barzahlen/max_order_total: 1000
+  default/payment/barzahlen/shop_id: 1
+  default/payment/barzahlen/payment_key: da49244dda9da8158f94134ba26a3ed258bde622
+  default/payment/barzahlen/notification_key: 3a25aea969b8768b034e81a64c4812136deab059
+  default/payment/barzahlen/custom_var_0: "{{store url=""}}&foo=2"
+  default/payment/barzahlen/custom_var_1: Magento 1.6.1.0
+  default/payment/barzahlen/custom_var_2: Connect Package 2.0 v.0.9.3-1

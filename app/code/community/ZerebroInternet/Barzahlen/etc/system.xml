@@ -1,0 +1,185 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Barzahlen Payment Module
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to info@barzahlen.de so we can send you a copy immediately.
+ *
+ * @category    ZerebroInternet
+ * @package     ZerebroInternet_Barzahlen
+ * @copyright   Copyright (c) 2012 Zerebro Internet GmbH (http://www.barzahlen.de)
+ * @author      Martin Seener
+ * @author      Alexander Diebler
+ * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL-3.0)
+ */
+-->
+<config>
+  <sections>
+    <payment>
+      <groups>
+        <barzahlen translate="label" module="paygate">
+          <label>bz_adm_title</label>
+          <sort_order>1</sort_order>
+          <show_in_default>1</show_in_default>
+          <show_in_website>1</show_in_website>
+          <show_in_store>1</show_in_store>
+
+          <fields>
+            <active translate="label">
+              <label>bz_adm_enabled_title</label>
+              <frontend_type>select</frontend_type>
+              <comment><![CDATA[bz_adm_enabled_comment]]></comment>
+              <source_model>adminhtml/system_config_source_yesno</source_model>
+              <sort_order>1</sort_order>
+              <show_in_default>1</show_in_default>
+              <show_in_website>1</show_in_website>
+              <show_in_store>0</show_in_store>
+            </active>
+            <sandbox translate="label">
+              <label>bz_adm_sandbox_title</label>
+              <comment>bz_adm_sandbox_comment</comment>
+              <frontend_type>select</frontend_type>
+              <source_model>adminhtml/system_config_source_yesno</source_model>
+              <sort_order>2</sort_order>
+              <show_in_default>1</show_in_default>
+              <show_in_website>1</show_in_website>
+              <show_in_store>0</show_in_store>
+            </sandbox>
+            <title translate="label">
+              <backend_model>barzahlen/adminexceptions_title</backend_model>
+              <label>bz_adm_co_title</label>
+              <comment>bz_adm_co_comment</comment>
+              <frontend_type>text</frontend_type>
+              <sort_order>3</sort_order>
+              <show_in_default>1</show_in_default>
+              <show_in_website>1</show_in_website>
+              <show_in_store>1</show_in_store>
+            </title>
+            <order_status translate="label">
+              <label>bz_adm_order_status_title</label>
+              <frontend_type>select</frontend_type>
+              <source_model>adminhtml/system_config_source_order_status</source_model>
+              <sort_order>4</sort_order>
+              <show_in_default>1</show_in_default>
+              <show_in_website>1</show_in_website>
+              <show_in_store>1</show_in_store>
+            </order_status>
+            <shop_id translate="label">
+              <backend_model>barzahlen/adminexceptions_shopid</backend_model>
+              <label>bz_adm_shopid_title</label>
+              <comment><![CDATA[bz_adm_shopid_comment]]></comment>
+              <frontend_type>text</frontend_type>
+              <sort_order>5</sort_order>
+              <show_in_default>1</show_in_default>
+              <show_in_website>1</show_in_website>
+              <show_in_store>0</show_in_store>
+            </shop_id>
+            <payment_key translate="label">
+              <backend_model>barzahlen/adminexceptions_paymentkey</backend_model>
+              <label>bz_adm_paymentkey_title</label>
+              <comment><![CDATA[bz_adm_paymentkey_comment]]></comment>
+              <frontend_type>text</frontend_type>
+              <sort_order>6</sort_order>
+              <show_in_default>1</show_in_default>
+              <show_in_website>1</show_in_website>
+              <show_in_store>0</show_in_store>
+            </payment_key>
+            <notification_key translate="label">
+              <backend_model>barzahlen/adminexceptions_notificationkey</backend_model>
+              <label>bz_adm_notificationkey_title</label>
+              <comment><![CDATA[bz_adm_notificationkey_comment]]></comment>
+              <frontend_type>text</frontend_type>
+              <sort_order>7</sort_order>
+              <show_in_default>1</show_in_default>
+              <show_in_website>1</show_in_website>
+              <show_in_store>0</show_in_store>
+            </notification_key>
+            <custom_var_0 translate="label">
+              <label>bz_adm_customvar0_title</label>
+              <frontend_type>text</frontend_type>
+              <sort_order>8</sort_order>
+              <show_in_default>1</show_in_default>
+              <show_in_website>1</show_in_website>
+              <show_in_store>1</show_in_store>
+            </custom_var_0>
+            <custom_var_1 translate="label">
+              <label>bz_adm_customvar1_title</label>
+              <frontend_type>text</frontend_type>
+              <sort_order>9</sort_order>
+              <show_in_default>1</show_in_default>
+              <show_in_website>1</show_in_website>
+              <show_in_store>1</show_in_store>
+            </custom_var_1>
+            <custom_var_2 translate="label">
+              <label>bz_adm_customvar2_title</label>
+              <frontend_type>text</frontend_type>
+              <sort_order>10</sort_order>
+              <show_in_default>1</show_in_default>
+              <show_in_website>1</show_in_website>
+              <show_in_store>1</show_in_store>
+            </custom_var_2>
+            <allowspecific translate="label">
+              <backend_model>barzahlen/adminexceptions_allspecificcountries</backend_model>
+              <label>bz_adm_allowspecific_title</label>
+              <frontend_type>allowspecific</frontend_type>
+              <sort_order>11</sort_order>
+              <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+              <show_in_default>1</show_in_default>
+              <show_in_website>1</show_in_website>
+              <show_in_store>0</show_in_store>
+            </allowspecific>
+            <specificcountry translate="label">
+              <backend_model>barzahlen/adminexceptions_specificcountry</backend_model>
+              <label>bz_adm_specificcountry_title</label>
+              <comment><![CDATA[bz_adm_specificcountry_comment]]></comment>
+              <frontend_type>multiselect</frontend_type>
+              <sort_order>12</sort_order>
+              <source_model>adminhtml/system_config_source_country</source_model>
+              <show_in_default>1</show_in_default>
+              <show_in_website>1</show_in_website>
+              <show_in_store>0</show_in_store>
+              <can_be_empty>1</can_be_empty>
+            </specificcountry>
+            <max_order_total translate="label">
+              <backend_model>barzahlen/adminexceptions_maxordertotal</backend_model>
+              <label>bz_adm_maxordertotal_title</label>
+              <comment>bz_adm_maxordertotal_comment</comment>
+              <frontend_type>text</frontend_type>
+              <sort_order>13</sort_order>
+              <show_in_default>1</show_in_default>
+              <show_in_website>1</show_in_website>
+              <show_in_store>1</show_in_store>
+            </max_order_total>
+            <sort_order translate="label">
+              <label>bz_adm_sortorder_title</label>
+              <comment>bz_adm_sortorder_comment</comment>
+              <frontend_type>text</frontend_type>
+              <sort_order>60</sort_order>
+              <show_in_default>1</show_in_default>
+              <show_in_website>1</show_in_website>
+              <show_in_store>1</show_in_store>
+            </sort_order>
+            <debug translate="label">
+              <label>bz_adm_debug_title</label>
+              <comment>bz_adm_debug_comment</comment>
+              <frontend_type>select</frontend_type>
+              <source_model>adminhtml/system_config_source_yesno</source_model>
+              <sort_order>100</sort_order>
+              <show_in_default>1</show_in_default>
+              <show_in_website>1</show_in_website>
+              <show_in_store>0</show_in_store>
+            </debug>
+          </fields>
+        </barzahlen>
+      </groups>
+    </payment>
+  </sections>
+</config>

@@ -1,0 +1,42 @@
+<!--
+/**
+ * Barzahlen Payment Module
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to info@barzahlen.com so we can send you a copy immediately.
+ *
+ * @category    ZerebroInternet
+ * @package     ZerebroInternet_Barzahlen
+ * @copyright   Copyright (c) 2012 Zerebro Internet GmbH (http://www.barzahlen.com)
+ * @author      Alexander Diebler
+ * @author      Martin Seener
+ * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL-3.0)
+ */
+ -->
+<phpunit colors="true">
+  
+  <testsuite name="zerebrointernet_barzahlen">
+    <directory phpVersion="5.3.1" phpVersionOperator=">=">./</directory>
+  </testsuite>
+  
+  <filter>
+    <whitelist>
+        <directory suffix=".php">app/code/community/ZerebroInternet/Barzahlen/Block</directory>
+        <directory suffix=".php">app/code/community/ZerebroInternet/Barzahlen/controllers</directory>
+        <directory suffix=".php">app/code/community/ZerebroInternet/Barzahlen/Helper</directory>
+        <directory suffix=".php">app/code/community/ZerebroInternet/Barzahlen/Model</directory>
+    </whitelist>
+  </filter>
+  
+  <logging>
+    <log type="coverage-html" target="cover" charset="UTF-8" yui="true" highlight="true" lowUpperBound="35" highLowerBound="70"/>
+  </logging>
+  
+</phpunit>
