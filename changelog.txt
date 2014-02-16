@@ -1,3 +1,6 @@
+==1.1.8 (02.04.2013)==
+* enabled backend orders with Barzahlen
+
 ==1.1.7 (28.03.2013)==
 * improved email sending
 

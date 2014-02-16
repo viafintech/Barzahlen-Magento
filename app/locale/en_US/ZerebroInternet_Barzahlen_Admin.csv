@@ -42,4 +42,7 @@
 "bz_adm_refund_error", "An error occurred, unable to create credit memo. Check barzahlen.log for further information."
 "bz_adm_resend_payment_success", "The payment slip was resend successful."
 "bz_adm_resend_refund_success", "The refund slip was resend successful."
-"bz_adm_resend_error", "The resend faild. Please check barzahlen.log for further information."
+"bz_adm_resend_error", "An error occurred. Please check barzahlen.log for further information."
+"bz_adm_partner","<b>Payment possible at:</b>"
+"bz_adm_sandbox","The <strong>Sandbox Mode</strong> is active. All placed orders receive a test payment slip. Test payment slips cannot be handled by our retail partners."
+"bz_frnt_ipn_pending","Barzahlen: Payment slip requested and sent successfully."

@@ -23,6 +23,42 @@
 class ZerebroInternet_Barzahlen_Model_Payment extends ZerebroInternet_Barzahlen_Model_Barzahlen {
 
   /**
+   * Observer action if Barzahlen was choosen as payment method for backend
+   * order creation.
+   *
+   * @param Mage_Sales_Model_Order $order
+   * @param Mage_Sales_Model_Quote $quote
+   * @return null
+   */
+  public function adminObserver($order, $quote) {
+
+    $order = $order->getOrder();
+
+    if($order->getPayment()->getMethod() != ZerebroInternet_Barzahlen_Model_Barzahlen::PAYMENT_CODE) {
+      return;
+    }
+
+    $payment = $this->_createPayment($order);
+
+    try {
+      Mage::getSingleton('barzahlen/barzahlen')->getBarzahlenApi()->handleRequest($payment);
+    }
+    catch (Exception $e) {
+      Mage::helper('barzahlen')->bzLog($e);
+      $this->_registerFailure($order);
+      Mage::throwException(Mage::helper('barzahlen')->__('bz_adm_resend_error'));
+    }
+
+    if($payment->isValid()) {
+      $this->_registerSuccess($order, $payment->getXmlArray(), true);
+    }
+    else {
+      $this->_registerFailure($order);
+      Mage::throwException(Mage::helper('barzahlen')->__('bz_adm_resend_error'));
+    }
+  }
+
+  /**
    * Performs payment handling and order update.
    */
   public function getTransactionId() {
@@ -34,25 +70,7 @@ class ZerebroInternet_Barzahlen_Model_Payment extends ZerebroInternet_Barzahlen_
       return;
     }
 
-    $orderAddress = $order->getBillingAddress();
-    $customerEmail = $order->getCustomerEmail();
-    $customerStreetNr = $orderAddress->getData("street");
-    $customerZipcode = $orderAddress->getData("postcode");
-    $customerCity = $orderAddress->getData("city");
-    $customerCountry = $orderAddress->getData("country_id");
-    $amount = Mage::getSingleton('core/store')->roundPrice($order->getGrandTotal(), 2);
-    $currency = $order->getOrderCurrencyCode();
-    $payment = Mage::getModel('barzahlen/api_request_payment',
-      array('customerEmail' => $customerEmail, 'customerStreetNr' => $customerStreetNr,
-            'customerZipcode' => $customerZipcode, 'customerCity' => $customerCity,
-            'customerCountry' => $customerCountry, 'orderId' => $orderId, 'amount' => $amount, 'currency' => $currency));
-
-    // filter the 3 custom vars and escape them for HTML compliance
-    $tcHelper = Mage::getModel('core/email_template_filter');
-    $customVar0 = $tcHelper->filter($this->getConfigData('custom_var_0'));
-    $customVar1 = $tcHelper->filter($this->getConfigData('custom_var_1'));
-    $customVar2 = $tcHelper->filter($this->getConfigData('custom_var_2'));
-    $payment->setCustomVar($customVar0, $customVar1, $customVar2);
+    $payment = $this->_createPayment($order);
 
     try {
       Mage::getSingleton('barzahlen/barzahlen')->getBarzahlenApi()->handleRequest($payment);
@@ -69,6 +87,37 @@ class ZerebroInternet_Barzahlen_Model_Payment extends ZerebroInternet_Barzahlen_
     else {
       $this->_registerFailure($order);
     }
+  }
+
+  /**
+   * Generates Barzahlen_Payment_Request from order details.
+   *
+   * @param Mage_Sales_Model_Order $order
+   * @return Barzahlen_Request_Payment
+   */
+  protected function _createPayment(Mage_Sales_Model_Order $order) {
+
+    $orderAddress = $order->getBillingAddress();
+    $customerEmail = $order->getCustomerEmail();
+    $customerStreetNr = $orderAddress->getData("street");
+    $customerZipcode = $orderAddress->getData("postcode");
+    $customerCity = $orderAddress->getData("city");
+    $customerCountry = $orderAddress->getData("country_id");
+    $amount = Mage::getSingleton('core/store')->roundPrice($order->getGrandTotal(), 2);
+    $currency = $order->getOrderCurrencyCode();
+    $payment = Mage::getModel('barzahlen/api_request_payment',
+      array('customerEmail' => $customerEmail, 'customerStreetNr' => $customerStreetNr,
+            'customerZipcode' => $customerZipcode, 'customerCity' => $customerCity,
+            'customerCountry' => $customerCountry, 'orderId' => $order->getRealOrderId(), 'amount' => $amount, 'currency' => $currency));
+
+    // filter the 3 custom vars and escape them for HTML compliance
+    $tcHelper = Mage::getModel('core/email_template_filter');
+    $customVar0 = $tcHelper->filter($this->getConfigData('custom_var_0'));
+    $customVar1 = $tcHelper->filter($this->getConfigData('custom_var_1'));
+    $customVar2 = $tcHelper->filter($this->getConfigData('custom_var_2'));
+    $payment->setCustomVar($customVar0, $customVar1, $customVar2);
+
+    return $payment;
   }
 
   /**
@@ -129,7 +178,7 @@ class ZerebroInternet_Barzahlen_Model_Payment extends ZerebroInternet_Barzahlen_
    * @param Mage_Sales_Model_Order $order
    * @param array $xmlArray array with xml response information
    */
-  protected function _registerSuccess($order, array $xmlArray) {
+  protected function _registerSuccess($order, array $xmlArray, $admin = false) {
 
     $session = Mage::getSingleton('checkout/session');
     $session->setResponse('200');
@@ -137,7 +186,9 @@ class ZerebroInternet_Barzahlen_Model_Payment extends ZerebroInternet_Barzahlen_
     $session->getQuote()->setIsActive(false)->save();
 
     $order->getPayment()->setAdditionalInformation('transaction_id', $xmlArray['transaction-id']);
-    $order->sendNewOrderEmail();
+    if(!$admin) {
+      $order->sendNewOrderEmail();
+    }
     $order->addStatusHistoryComment(Mage::helper('barzahlen')->__('bz_frnt_ipn_pending'), Mage::getModel('barzahlen/barzahlen')->getConfigData('order_status'));
     $order->save();
   }

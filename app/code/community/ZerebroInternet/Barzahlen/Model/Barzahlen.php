@@ -37,9 +37,9 @@ class ZerebroInternet_Barzahlen_Model_Barzahlen extends Mage_Payment_Model_Metho
    */
   protected $_canRefund               = true; //!< Barzahlen transactions can be refunded
   protected $_canRefundInvoicePartial = true; //!< refunds can be done partial
-  protected $_canUseInternal          = true; //!< can be used in admin panel
-  protected $_canUseCheckout          = true; //!< can be used as method on checkout page
-  protected $_canUseForMultishipping  = true; //!< orders may be shipped in more than one part
+  protected $_canUseInternal          = true; //!< can be used in admin panel checkout
+  protected $_canUseCheckout          = true; //!< can be used as method on onepage checkout
+  protected $_canUseForMultishipping  = true; //!< can be used as method on multipage checkout
 
   /**
    * Barzahlen payment state possible values

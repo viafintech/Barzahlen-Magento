@@ -43,3 +43,6 @@
 "bz_adm_resend_payment_success", "Der Zahlschein wurde erneut an den Kunden versendet."
 "bz_adm_resend_refund_success", "Der Auszahlschein wurde erneut an den Kunden versendet."
 "bz_adm_resend_error", "Es ist ein Fehler aufgetreten. Prüfen Sie barzahlen.log für weitere Informationen."
+"bz_adm_partner","<b>Bezahlen möglich bei:</b>"
+"bz_adm_sandbox","Der <strong>Sandbox Modus</strong> ist aktiv. Allen getätigten Zahlungen wird ein Test-Zahlschein zugewiesen. Dieser kann nicht von unseren Einzelhandelspartnern verarbeitet werden."
+"bz_frnt_ipn_pending","Barzahlen: Zahlschein erfolgreich angefordert und versendet."
