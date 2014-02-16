@@ -1,3 +1,7 @@
+==1.1.9 (10.04.2013)==
+* updated Barzahlen API PHP SDK
+* added automatic payment slip cancelation together with order cancelation
+
 ==1.1.8 (02.04.2013)==
 * enabled backend orders with Barzahlen
 

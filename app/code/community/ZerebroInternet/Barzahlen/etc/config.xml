@@ -25,7 +25,7 @@
 
   <modules>
     <ZerebroInternet_Barzahlen>
-      <version>1.1.8</version>
+      <version>1.1.9</version>
     </ZerebroInternet_Barzahlen>
   </modules>
 
@@ -124,6 +124,15 @@
           </barzahlen_observer>
         </observers>
       </checkout_submit_all_after>
+      <order_cancel_after>
+        <observers>
+          <barzahlen_observer>
+            <type>singleton</type>
+            <class>barzahlen/cancel</class>
+            <method>cancelObserver</method>
+          </barzahlen_observer>
+        </observers>
+      </order_cancel_after>
       <sales_order_creditmemo_refund>
         <observers>
           <barzahlen_observer>
