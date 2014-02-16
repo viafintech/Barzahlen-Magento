@@ -47,7 +47,7 @@ class ZerebroInternet_Barzahlen_Model_Api_Request_Payment extends ZerebroInterne
     $this->_customerZipcode = $arguments['customerZipcode'];
     $this->_customerCity = $this->isoConvert($arguments['customerCity']);
     $this->_customerCountry = $arguments['customerCountry'];
-    $this->_amount = $arguments['amount'];
+    $this->_amount = round($arguments['amount'], 2);
     $this->_currency = $arguments['currency'];
     $this->_orderId = $arguments['orderId'];
   }

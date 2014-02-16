@@ -112,7 +112,7 @@ class ZerebroInternet_Barzahlen_Model_Api extends ZerebroInternet_Barzahlen_Mode
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
-    curl_setopt($curl, CURLOPT_CAINFO, dirname(__FILE__) . '/Api/certs/ca-bundle.crt');
+    curl_setopt($curl, CURLOPT_CAINFO, Mage::getRoot() . '/code/community/ZerebroInternet/Barzahlen/Model/Api/certs/ca-bundle.crt');
     curl_setopt($curl, CURLOPT_TIMEOUT, 30);
     curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 15);
     curl_setopt($curl, CURLOPT_HTTP_VERSION, 1.1);

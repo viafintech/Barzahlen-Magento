@@ -36,7 +36,7 @@ class ZerebroInternet_Barzahlen_Model_Api_Request_Refund extends ZerebroInternet
   public function __construct(array $arguments) {
 
     $this->_transactionId = $arguments['transactionId'];
-    $this->_amount = $arguments['amount'];
+    $this->_amount = round($arguments['amount'], 2);
     $this->_currency = $arguments['currency'];
   }
 

@@ -84,7 +84,7 @@ class ZerebroInternet_Barzahlen_Model_Ipn {
     }
 
     if(isset($this->_receivedData['order_id'])) {
-      if($this->_order->getGrandTotal() != $this->_receivedData['amount']) {
+      if(round($this->_order->getGrandTotal(), 2) != round($this->_receivedData['amount'], 2)) {
         Mage::helper('barzahlen')->bzLog('controller/ipn: order total amount doesn\'t match', $this->_receivedData);
         return false;
       }
@@ -136,14 +136,17 @@ class ZerebroInternet_Barzahlen_Model_Ipn {
       return;
     }
 
-    Mage::getModel('sales/order_invoice_api')->create($this->_order->getIncrementId(), array(), $this->_createIpnComment(), false, true);
+    Mage::getModel('sales/order_invoice_api')->create($this->_order->getIncrementId(), array(), $this->_createIpnComment(), true, true);
+    $this->_order->sendOrderUpdateEmail(true, $this->_createIpnComment());
   }
 
   /**
    * Cancels an order after the period of ten days elasped.
    */
   protected function _processTransactionExpired() {
+
     $this->_order->registerCancellation($this->_createIpnComment(), false);
+    $this->_order->sendOrderUpdateEmail(true, $this->_createIpnComment());
   }
 
   /**

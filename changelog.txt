@@ -1,3 +1,7 @@
+==1.1.6 (27.03.2013)==
+* avoiding rounding mistakes in amounts
+* added automatic email notification for paid / expire
+
 ==1.1.5 (12.03.2013)==
 * enabled all settings for store views
 
