@@ -46,3 +46,6 @@
 "bz_adm_partner","<b>Bezahlen möglich bei:</b>"
 "bz_adm_sandbox","Der <strong>Sandbox Modus</strong> ist aktiv. Allen getätigten Zahlungen wird ein Test-Zahlschein zugewiesen. Dieser kann nicht von unseren Einzelhandelspartnern verarbeitet werden."
 "bz_frnt_ipn_pending","Barzahlen: Zahlschein erfolgreich angefordert und versendet."
+"bz_adm_now_available"," Jetzt verfügbar "
+"bz_adm_over"," über "
+"bz_adm_or"," oder "

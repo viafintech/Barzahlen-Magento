@@ -1,3 +1,7 @@
+==1.2.0 (25.04.2013)==
+* implemented automatic plugin version check (weekly)
+* using PSR2 coding standard
+
 ==1.1.9 (10.04.2013)==
 * updated Barzahlen API PHP SDK
 * added automatic payment slip cancelation together with order cancelation

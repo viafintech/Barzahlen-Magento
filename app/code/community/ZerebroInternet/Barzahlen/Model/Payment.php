@@ -14,183 +14,177 @@
  *
  * @category    ZerebroInternet
  * @package     ZerebroInternet_Barzahlen
- * @copyright   Copyright (c) 2012 Zerebro Internet GmbH (http://www.barzahlen.de)
+ * @copyright   Copyright (c) 2013 Zerebro Internet GmbH (http://www.barzahlen.de)
  * @author      Martin Seener
  * @author      Alexander Diebler
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL-3.0)
  */
 
-class ZerebroInternet_Barzahlen_Model_Payment extends ZerebroInternet_Barzahlen_Model_Barzahlen {
+class ZerebroInternet_Barzahlen_Model_Payment extends ZerebroInternet_Barzahlen_Model_Barzahlen
+{
+    /**
+     * Observer action if Barzahlen was choosen as payment method for backend
+     * order creation.
+     *
+     * @param Mage_Sales_Model_Order $order
+     * @param Mage_Sales_Model_Quote $quote
+     * @return null
+     */
+    public function adminObserver($order, $quote)
+    {
+        $order = $order->getOrder();
 
-  /**
-   * Observer action if Barzahlen was choosen as payment method for backend
-   * order creation.
-   *
-   * @param Mage_Sales_Model_Order $order
-   * @param Mage_Sales_Model_Quote $quote
-   * @return null
-   */
-  public function adminObserver($order, $quote) {
+        if ($order->getPayment()->getMethod() != ZerebroInternet_Barzahlen_Model_Barzahlen::PAYMENT_CODE) {
+            return;
+        }
 
-    $order = $order->getOrder();
+        $payment = $this->_createPayment($order);
 
-    if($order->getPayment()->getMethod() != ZerebroInternet_Barzahlen_Model_Barzahlen::PAYMENT_CODE) {
-      return;
+        try {
+            Mage::getSingleton('barzahlen/barzahlen')->getBarzahlenApi()->handleRequest($payment);
+        } catch (Exception $e) {
+            Mage::helper('barzahlen')->bzLog($e);
+            $this->_registerFailure($order);
+            Mage::throwException(Mage::helper('barzahlen')->__('bz_adm_resend_error'));
+        }
+
+        if ($payment->isValid()) {
+            $this->_registerSuccess($order, $payment->getXmlArray(), true);
+        } else {
+            $this->_registerFailure($order);
+            Mage::throwException(Mage::helper('barzahlen')->__('bz_adm_resend_error'));
+        }
     }
 
-    $payment = $this->_createPayment($order);
+    /**
+     * Performs payment handling and order update.
+     */
+    public function getTransactionId()
+    {
+        $orderId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
+        $order = Mage::getModel('sales/order')->loadByIncrementId($orderId);
 
-    try {
-      Mage::getSingleton('barzahlen/barzahlen')->getBarzahlenApi()->handleRequest($payment);
-    }
-    catch (Exception $e) {
-      Mage::helper('barzahlen')->bzLog($e);
-      $this->_registerFailure($order);
-      Mage::throwException(Mage::helper('barzahlen')->__('bz_adm_resend_error'));
-    }
+        if (!$this->_validateOrder($order)) {
+            return;
+        }
 
-    if($payment->isValid()) {
-      $this->_registerSuccess($order, $payment->getXmlArray(), true);
-    }
-    else {
-      $this->_registerFailure($order);
-      Mage::throwException(Mage::helper('barzahlen')->__('bz_adm_resend_error'));
-    }
-  }
+        $payment = $this->_createPayment($order);
 
-  /**
-   * Performs payment handling and order update.
-   */
-  public function getTransactionId() {
+        try {
+            Mage::getSingleton('barzahlen/barzahlen')->getBarzahlenApi()->handleRequest($payment);
+        } catch (Exception $e) {
+            Mage::helper('barzahlen')->bzLog($e);
+            $this->_registerFailure($order);
+            throw $e;
+        }
 
-    $orderId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
-    $order = Mage::getModel('sales/order')->loadByIncrementId($orderId);
-
-    if(!$this->_validateOrder($order)) {
-      return;
+        if ($payment->isValid()) {
+            $this->_registerSuccess($order, $payment->getXmlArray());
+        } else {
+            $this->_registerFailure($order);
+        }
     }
 
-    $payment = $this->_createPayment($order);
+    /**
+     * Generates Barzahlen_Payment_Request from order details.
+     *
+     * @param Mage_Sales_Model_Order $order
+     * @return Barzahlen_Request_Payment
+     */
+    protected function _createPayment(Mage_Sales_Model_Order $order)
+    {
+        $orderAddress = $order->getBillingAddress();
+        $customerEmail = $order->getCustomerEmail();
+        $customerStreetNr = $orderAddress->getData("street");
+        $customerZipcode = $orderAddress->getData("postcode");
+        $customerCity = $orderAddress->getData("city");
+        $customerCountry = $orderAddress->getData("country_id");
+        $amount = Mage::getSingleton('core/store')->roundPrice($order->getGrandTotal(), 2);
+        $currency = $order->getOrderCurrencyCode();
+        $payment = Mage::getModel('barzahlen/api_request_payment', array('customerEmail' => $customerEmail, 'customerStreetNr' => $customerStreetNr,
+                    'customerZipcode' => $customerZipcode, 'customerCity' => $customerCity,
+                    'customerCountry' => $customerCountry, 'orderId' => $order->getRealOrderId(), 'amount' => $amount, 'currency' => $currency));
 
-    try {
-      Mage::getSingleton('barzahlen/barzahlen')->getBarzahlenApi()->handleRequest($payment);
-    }
-    catch (Exception $e) {
-      Mage::helper('barzahlen')->bzLog($e);
-      $this->_registerFailure($order);
-      throw $e;
-    }
+        // filter the 3 custom vars and escape them for HTML compliance
+        $tcHelper = Mage::getModel('core/email_template_filter');
+        $customVar0 = $tcHelper->filter($this->getConfigData('custom_var_0'));
+        $customVar1 = $tcHelper->filter($this->getConfigData('custom_var_1'));
+        $customVar2 = $tcHelper->filter($this->getConfigData('custom_var_2'));
+        $payment->setCustomVar($customVar0, $customVar1, $customVar2);
 
-    if($payment->isValid()) {
-      $this->_registerSuccess($order, $payment->getXmlArray());
-    }
-    else {
-      $this->_registerFailure($order);
-    }
-  }
-
-  /**
-   * Generates Barzahlen_Payment_Request from order details.
-   *
-   * @param Mage_Sales_Model_Order $order
-   * @return Barzahlen_Request_Payment
-   */
-  protected function _createPayment(Mage_Sales_Model_Order $order) {
-
-    $orderAddress = $order->getBillingAddress();
-    $customerEmail = $order->getCustomerEmail();
-    $customerStreetNr = $orderAddress->getData("street");
-    $customerZipcode = $orderAddress->getData("postcode");
-    $customerCity = $orderAddress->getData("city");
-    $customerCountry = $orderAddress->getData("country_id");
-    $amount = Mage::getSingleton('core/store')->roundPrice($order->getGrandTotal(), 2);
-    $currency = $order->getOrderCurrencyCode();
-    $payment = Mage::getModel('barzahlen/api_request_payment',
-      array('customerEmail' => $customerEmail, 'customerStreetNr' => $customerStreetNr,
-            'customerZipcode' => $customerZipcode, 'customerCity' => $customerCity,
-            'customerCountry' => $customerCountry, 'orderId' => $order->getRealOrderId(), 'amount' => $amount, 'currency' => $currency));
-
-    // filter the 3 custom vars and escape them for HTML compliance
-    $tcHelper = Mage::getModel('core/email_template_filter');
-    $customVar0 = $tcHelper->filter($this->getConfigData('custom_var_0'));
-    $customVar1 = $tcHelper->filter($this->getConfigData('custom_var_1'));
-    $customVar2 = $tcHelper->filter($this->getConfigData('custom_var_2'));
-    $payment->setCustomVar($customVar0, $customVar1, $customVar2);
-
-    return $payment;
-  }
-
-  /**
-   * Validates, that the order exists, Barzahlen was choosen and the order wasn't paid yet.
-   *
-   * @param Mage_Sales_Model_Order $order
-   * @return boolean
-   */
-  protected function _validateOrder($order) {
-
-    // check if order exisits
-    if (!$order->getId()) {
-      Mage::helper('barzahlen')->bzLog('controllers/checkout: order not existing, aborting/redirecting');
-      return false;
+        return $payment;
     }
 
-    // get order payment and its information
-    $payment = $order->getPayment();
-    $code = $payment->getMethod();
-    $transactionId = $payment->getAdditionalInformation('transaction_id');
+    /**
+     * Validates, that the order exists, Barzahlen was choosen and the order wasn't paid yet.
+     *
+     * @param Mage_Sales_Model_Order $order
+     * @return boolean
+     */
+    protected function _validateOrder($order)
+    {
+        // check if order exisits
+        if (!$order->getId()) {
+            Mage::helper('barzahlen')->bzLog('controllers/checkout: order not existing, aborting/redirecting');
+            return false;
+        }
 
-    // check that Barzahlen was choosen
-    if($code != self::PAYMENT_CODE) {
-      $errorData = array($order->getId(), $code);
-      Mage::helper('barzahlen')->bzLog('controllers/checkout: Barzahlen was not choosen as payment method', $errorData);
-      return false;
+        // get order payment and its information
+        $payment = $order->getPayment();
+        $code = $payment->getMethod();
+        $transactionId = $payment->getAdditionalInformation('transaction_id');
+
+        // check that Barzahlen was choosen
+        if ($code != self::PAYMENT_CODE) {
+            $errorData = array($order->getId(), $code);
+            Mage::helper('barzahlen')->bzLog('controllers/checkout: Barzahlen was not choosen as payment method', $errorData);
+            return false;
+        }
+
+        // check that order isn't paid yet and is still payable
+        if ($transactionId != '' || $order->getState() == Mage_Sales_Model_Order::STATE_CANCELED) {
+            $errorData = array($order->getId(), $transactionId);
+            Mage::helper('barzahlen')->bzLog('controllers/checkout: order already got an transaction id', $errorData);
+            return false;
+        }
+
+        return true;
     }
 
-    // check that order isn't paid yet and is still payable
-    if($transactionId != '' || $order->getState() == Mage_Sales_Model_Order::STATE_CANCELED) {
-      $errorData = array($order->getId(), $transactionId);
-      Mage::helper('barzahlen')->bzLog('controllers/checkout: order already got an transaction id', $errorData);
-      return false;
+    /**
+     * Sets all information for the failure page.
+     *
+     * @param Mage_Sales_Model_Order $order
+     */
+    protected function _registerFailure($order)
+    {
+        $session = Mage::getSingleton('checkout/session');
+        $session->setResponse('400');
+        $session->getQuote()->setIsActive(false)->save();
+
+        $errorMsg = Mage::helper('barzahlen')->__('bz_frnt_ipn_denied');
+        $order->setState(Mage_Sales_Model_Order::STATE_CANCELED, true, $errorMsg);
+        $order->save();
     }
 
-    return true;
-  }
+    /**
+     * Sets all information for the success page.
+     *
+     * @param Mage_Sales_Model_Order $order
+     * @param array $xmlArray array with xml response information
+     */
+    protected function _registerSuccess($order, array $xmlArray, $admin = false)
+    {
+        $session = Mage::getSingleton('checkout/session');
+        $session->setResponse('200');
+        $session->setBzInfotext1($xmlArray['infotext-1']);
+        $session->getQuote()->setIsActive(false)->save();
 
-  /**
-   * Sets all information for the failure page.
-   *
-   * @param Mage_Sales_Model_Order $order
-   */
-  protected function _registerFailure($order) {
-
-    $session = Mage::getSingleton('checkout/session');
-    $session->setResponse('400');
-    $session->getQuote()->setIsActive(false)->save();
-
-    $errorMsg = Mage::helper('barzahlen')->__('bz_frnt_ipn_denied');
-    $order->setState(Mage_Sales_Model_Order::STATE_CANCELED, true, $errorMsg);
-    $order->save();
-  }
-
-  /**
-   * Sets all information for the success page.
-   *
-   * @param Mage_Sales_Model_Order $order
-   * @param array $xmlArray array with xml response information
-   */
-  protected function _registerSuccess($order, array $xmlArray, $admin = false) {
-
-    $session = Mage::getSingleton('checkout/session');
-    $session->setResponse('200');
-    $session->setBzInfotext1($xmlArray['infotext-1']);
-    $session->getQuote()->setIsActive(false)->save();
-
-    $order->getPayment()->setAdditionalInformation('transaction_id', $xmlArray['transaction-id']);
-    if(!$admin) {
-      $order->sendNewOrderEmail();
+        $order->getPayment()->setAdditionalInformation('transaction_id', $xmlArray['transaction-id']);
+        if (!$admin) {
+            $order->sendNewOrderEmail();
+        }
+        $order->addStatusHistoryComment(Mage::helper('barzahlen')->__('bz_frnt_ipn_pending'), Mage::getModel('barzahlen/barzahlen')->getConfigData('order_status'));
+        $order->save();
     }
-    $order->addStatusHistoryComment(Mage::helper('barzahlen')->__('bz_frnt_ipn_pending'), Mage::getModel('barzahlen/barzahlen')->getConfigData('order_status'));
-    $order->save();
-  }
 }
-?>

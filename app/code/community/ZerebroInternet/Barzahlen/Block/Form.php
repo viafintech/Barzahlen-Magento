@@ -14,24 +14,28 @@
  *
  * @category    ZerebroInternet
  * @package     ZerebroInternet_Barzahlen
- * @copyright   Copyright (c) 2012 Zerebro Internet GmbH (http://www.barzahlen.de)
+ * @copyright   Copyright (c) 2013 Zerebro Internet GmbH (http://www.barzahlen.de)
  * @author      Martin Seener
  * @author      Alexander Diebler
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL-3.0)
  */
 
-class ZerebroInternet_Barzahlen_Block_Form extends Mage_Payment_Block_Form {
+class ZerebroInternet_Barzahlen_Block_Form extends Mage_Payment_Block_Form
+{
+    /**
+     * Create the Form Block (Checkout Onepage) and assign the template to it.
+     * 
+     * @return null
+     */
+    protected function _construct()
+    {
+        $mark = Mage::getConfig()->getBlockClassName('core/template');
+        $mark = new $mark;
+        $mark->setTemplate('barzahlen/mark.phtml');
+        $this->setTemplate('barzahlen/form.phtml')
+                ->setMethodTitle('')
+                ->setMethodLabelAfterHtml($mark->toHtml());
 
-  protected function _construct() {
-    // create the Form Block (Checkout Onepage) and assign the template to it
-
-    $mark = Mage::getConfig()->getBlockClassName('core/template');
-    $mark = new $mark;
-    $mark->setTemplate('barzahlen/mark.phtml');
-    $this->setTemplate('barzahlen/form.phtml')
-         ->setMethodTitle('')
-         ->setMethodLabelAfterHtml($mark->toHtml());
-    
-    return parent::_construct();
-  }
+        return parent::_construct();
+    }
 }

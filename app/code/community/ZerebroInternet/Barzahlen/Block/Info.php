@@ -14,17 +14,20 @@
  *
  * @category    ZerebroInternet
  * @package     ZerebroInternet_Barzahlen
- * @copyright   Copyright (c) 2012 Zerebro Internet GmbH (http://www.barzahlen.de)
+ * @copyright   Copyright (c) 2013 Zerebro Internet GmbH (http://www.barzahlen.de)
  * @author      Martin Seener
  * @author      Alexander Diebler
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL-3.0)
  */
 
-class ZerebroInternet_Barzahlen_Block_Info extends Mage_Payment_Block_Info {
-
-  protected function _construct() {
-    // create the Info Block (Checkout Onepage Sidebar) and assign the template to it
-    parent::_construct();
-    $this->setTemplate('barzahlen/info.phtml');
-  }
+class ZerebroInternet_Barzahlen_Block_Info extends Mage_Payment_Block_Info
+{
+    /**
+     * Create the info block (Checkout Onepage Sidebar) and assign the template to it.
+     */
+    protected function _construct()
+    {
+        parent::_construct();
+        $this->setTemplate('barzahlen/info.phtml');
+    }
 }

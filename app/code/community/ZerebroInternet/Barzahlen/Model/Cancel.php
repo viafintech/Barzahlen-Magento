@@ -14,41 +14,41 @@
  *
  * @category    ZerebroInternet
  * @package     ZerebroInternet_Barzahlen
- * @copyright   Copyright (c) 2012 Zerebro Internet GmbH (http://www.barzahlen.de)
+ * @copyright   Copyright (c) 2013 Zerebro Internet GmbH (http://www.barzahlen.de)
  * @author      Martin Seener
  * @author      Alexander Diebler
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL-3.0)
  */
 
-class ZerebroInternet_Barzahlen_Model_Cancel extends Mage_Core_Model_Abstract {
+class ZerebroInternet_Barzahlen_Model_Cancel extends Mage_Core_Model_Abstract
+{
+    /**
+     * Cancels pending payment slips together with orders.
+     *
+     * @return boolean
+     */
+    public function cancelObserver($order)
+    {
+        $order = $order->getOrder();
 
-  /**
-   *
-   * @return null
-   */
-  public function cancelObserver($order) {
+        if (!$order->getId()) {
+            Mage::throwException('No valid order choosen.');
+        }
 
-    $order = $order->getOrder();
+        if ($order->getPayment()->getMethod() != ZerebroInternet_Barzahlen_Model_Barzahlen::PAYMENT_CODE) {
+            return;
+        }
 
-    if(!$order->getId()) {
-      Mage::throwException('No valid order choosen.');
+        $transactionId = $order->getPayment()->getAdditionalInformation('transaction_id');
+
+        $cancel = Mage::getModel('barzahlen/api_request_cancel', array('transactionId' => $transactionId));
+
+        try {
+            Mage::getSingleton('barzahlen/barzahlen')->getBarzahlenApi()->handleRequest($cancel);
+        } catch (Exception $e) {
+            Mage::helper('barzahlen')->bzLog($e);
+        }
+
+        return $cancel->isValid();
     }
-
-    if($order->getPayment()->getMethod() != ZerebroInternet_Barzahlen_Model_Barzahlen::PAYMENT_CODE) {
-      return;
-    }
-
-    $transactionId = $order->getPayment()->getAdditionalInformation('transaction_id');
-
-    $cancel = Mage::getModel('barzahlen/api_request_cancel', array('transactionId' => $transactionId));
-
-    try {
-      Mage::getSingleton('barzahlen/barzahlen')->getBarzahlenApi()->handleRequest($cancel);
-    }
-    catch(Exception $e) {
-      Mage::helper('barzahlen')->bzLog($e);
-    }
-
-    return $cancel->isValid();
-  }
 }

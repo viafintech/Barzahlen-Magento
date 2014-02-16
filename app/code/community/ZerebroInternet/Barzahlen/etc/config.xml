@@ -15,7 +15,7 @@
  *
  * @category    ZerebroInternet
  * @package     ZerebroInternet_Barzahlen
- * @copyright   Copyright (c) 2012 Zerebro Internet GmbH (http://www.barzahlen.de)
+ * @copyright   Copyright (c) 2013 Zerebro Internet GmbH (http://www.barzahlen.de)
  * @author      Martin Seener
  * @author      Alexander Diebler
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL-3.0)
@@ -25,7 +25,7 @@
 
   <modules>
     <ZerebroInternet_Barzahlen>
-      <version>1.1.9</version>
+      <version>1.2.0</version>
     </ZerebroInternet_Barzahlen>
   </modules>
 
@@ -132,7 +132,7 @@
             <method>cancelObserver</method>
           </barzahlen_observer>
         </observers>
-      </order_cancel_after>
+      </order_cancel_after>admin_session_user_login_success
       <sales_order_creditmemo_refund>
         <observers>
           <barzahlen_observer>
@@ -142,6 +142,15 @@
           </barzahlen_observer>
         </observers>
       </sales_order_creditmemo_refund>
+      <admin_session_user_login_success>
+        <observers>
+          <barzahlen_observer>
+            <type>singleton</type>
+            <class>barzahlen/check</class>
+            <method>checkObserver</method>
+          </barzahlen_observer>
+        </observers>
+      </admin_session_user_login_success>
     </events>
   </adminhtml>
 

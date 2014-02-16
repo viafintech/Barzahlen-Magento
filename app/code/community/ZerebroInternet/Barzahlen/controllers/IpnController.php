@@ -14,37 +14,34 @@
  *
  * @category    ZerebroInternet
  * @package     ZerebroInternet_Barzahlen
- * @copyright   Copyright (c) 2012 Zerebro Internet GmbH (http://www.barzahlen.de)
+ * @copyright   Copyright (c) 2013 Zerebro Internet GmbH (http://www.barzahlen.de)
  * @author      Martin Seener
  * @author      Alexander Diebler
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL-3.0)
  */
 
-class ZerebroInternet_Barzahlen_IpnController extends Mage_Core_Controller_Front_Action {
+class ZerebroInternet_Barzahlen_IpnController extends Mage_Core_Controller_Front_Action
+{
+    /**
+     * Instantiate IPN model and pass IPN request to it. After successful hash validation HTTP header
+     * 200 is send first before the database is updated.
+     */
+    public function indexAction()
+    {
+        try {
+            $data = $this->getRequest()->getQuery();
+            $ipnModel = Mage::getModel('barzahlen/ipn');
 
-  /**
-   * Instantiate IPN model and pass IPN request to it. After successful hash validation HTTP header
-   * 200 is send first before the database is updated.
-   */
-  public function indexAction() {
-
-    try {
-      $data = $this->getRequest()->getQuery();
-      $ipnModel = Mage::getModel('barzahlen/ipn');
-
-      if($ipnModel->sendResponseHeader($data)) {
-        header("HTTP/1.1 200 OK");
-        header("Status: 200 OK");
-        $ipnModel->updateDatabase();
-      }
-      else {
-        header("HTTP/1.1 400 Bad Request");
-        header("Status: 400 Bad Request");
-      }
+            if ($ipnModel->sendResponseHeader($data)) {
+                header("HTTP/1.1 200 OK");
+                header("Status: 200 OK");
+                $ipnModel->updateDatabase();
+            } else {
+                header("HTTP/1.1 400 Bad Request");
+                header("Status: 400 Bad Request");
+            }
+        } catch (Exception $e) {
+            Mage::logException($e);
+        }
     }
-    catch (Exception $e) {
-      Mage::logException($e);
-    }
-  }
 }
-?>

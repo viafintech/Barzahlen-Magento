@@ -14,33 +14,30 @@
  *
  * @category    ZerebroInternet
  * @package     ZerebroInternet_Barzahlen
- * @copyright   Copyright (c) 2012 Zerebro Internet GmbH (http://www.barzahlen.de)
+ * @copyright   Copyright (c) 2013 Zerebro Internet GmbH (http://www.barzahlen.de)
  * @author      Martin Seener
  * @author      Alexander Diebler
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL-3.0)
  */
 
-class ZerebroInternet_Barzahlen_Model_Resend extends ZerebroInternet_Barzahlen_Model_Barzahlen {
+class ZerebroInternet_Barzahlen_Model_Resend extends ZerebroInternet_Barzahlen_Model_Barzahlen
+{
+    /**
+     * Sends resend request to Barzahlen and returns if request was successful.
+     *
+     * @param integer $transactionId Barzahlen Transaction ID
+     * @return boolean
+     */
+    public function resend($transactionId)
+    {
+        $resend = Mage::getModel('barzahlen/api_request_resend', array('transactionId' => $transactionId));
 
-  /**
-   * Sends resend request to Barzahlen and returns if request was successful.
-   *
-   * @param integer $transactionId Barzahlen Transaction ID
-   * @return boolean
-   */
-  public function resend($transactionId) {
+        try {
+            Mage::getSingleton('barzahlen/barzahlen')->getBarzahlenApi()->handleRequest($resend);
+        } catch (Exception $e) {
+            Mage::helper('barzahlen')->bzLog($e);
+        }
 
-    $resend = Mage::getModel('barzahlen/api_request_resend', array('transactionId' => $transactionId));
-
-    try {
-      Mage::getSingleton('barzahlen/barzahlen')->getBarzahlenApi()->handleRequest($resend);
+        return $resend->isValid();
     }
-    catch(Exception $e) {
-      Mage::helper('barzahlen')->bzLog($e);
-    }
-
-    return $resend->isValid();
-  }
 }
-
-?>

@@ -14,24 +14,27 @@
  *
  * @category    ZerebroInternet
  * @package     ZerebroInternet_Barzahlen
- * @copyright   Copyright (c) 2012 Zerebro Internet GmbH (http://www.barzahlen.de)
+ * @copyright   Copyright (c) 2013 Zerebro Internet GmbH (http://www.barzahlen.de)
  * @author      Martin Seener
  * @author      Alexander Diebler
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL-3.0)
  */
 
-class ZerebroInternet_Barzahlen_Helper_Data extends Mage_Core_Helper_Abstract {
+class ZerebroInternet_Barzahlen_Helper_Data extends Mage_Core_Helper_Abstract
+{
+    /**
+     * @const file for all log and debug data
+     */
+    const DEFAULT_LOG_FILE = 'barzahlen.log';
 
-  const DEFAULT_LOG_FILE = 'barzahlen.log'; //!< file for all log and debug data
-
-  /**
-   * Logs errors to the given log file.
-   *
-   * @param string $error_msg explaination of the occurred error
-   * @param array $error_data corresponding data
-   */
-  public function bzLog($error_msg, array $error_data = array()) {
-    Mage::log($error_msg . " - " . serialize($error_data) . "\r\r", null, self::DEFAULT_LOG_FILE);
-  }
+    /**
+     * Logs errors to the given log file.
+     *
+     * @param string $error_msg explaination of the occurred error
+     * @param array $error_data corresponding data
+     */
+    public function bzLog($error_msg, array $error_data = array())
+    {
+        Mage::log($error_msg . " - " . serialize($error_data) . "\r\r", null, self::DEFAULT_LOG_FILE);
+    }
 }
-?>

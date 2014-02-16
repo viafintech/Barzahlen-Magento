@@ -46,3 +46,6 @@
 "bz_adm_partner","<b>Payment possible at:</b>"
 "bz_adm_sandbox","The <strong>Sandbox Mode</strong> is active. All placed orders receive a test payment slip. Test payment slips cannot be handled by our retail partners."
 "bz_frnt_ipn_pending","Barzahlen: Payment slip requested and sent successfully."
+"bz_adm_now_available"," Now available "
+"bz_adm_over"," over "
+"bz_adm_or"," or "
