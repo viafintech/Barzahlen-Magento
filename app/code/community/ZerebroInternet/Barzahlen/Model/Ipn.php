@@ -137,7 +137,6 @@ class ZerebroInternet_Barzahlen_Model_Ipn {
     }
 
     Mage::getModel('sales/order_invoice_api')->create($this->_order->getIncrementId(), array(), $this->_createIpnComment(), true, true);
-    $this->_order->sendOrderUpdateEmail(true, $this->_createIpnComment());
   }
 
   /**
@@ -145,7 +144,7 @@ class ZerebroInternet_Barzahlen_Model_Ipn {
    */
   protected function _processTransactionExpired() {
 
-    $this->_order->registerCancellation($this->_createIpnComment(), false);
+    $this->_order->registerCancellation($this->_createIpnComment(), false)->save();
     $this->_order->sendOrderUpdateEmail(true, $this->_createIpnComment());
   }
 

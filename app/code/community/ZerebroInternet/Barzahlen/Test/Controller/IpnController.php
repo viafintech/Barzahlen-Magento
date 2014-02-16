@@ -458,6 +458,7 @@ class ZerebroInternet_Barzahlen_Test_Controller_IpnController extends EcomDev_PH
   function invoiceHelper() {
     $order = Mage::getModel('sales/order')->loadByIncrementId('100000003');
     $order->setState('processing', true)->save();
+    return $order;
   }
 
   /**
@@ -466,6 +467,7 @@ class ZerebroInternet_Barzahlen_Test_Controller_IpnController extends EcomDev_PH
   function cancelHelper() {
     $order = Mage::getModel('sales/order')->loadByIncrementId('100000003');
     $order->setState('canceled', 'canceled')->save();
+    return $order;
   }
 
   /**
