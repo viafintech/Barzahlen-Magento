@@ -27,10 +27,10 @@
     <?php
       echo $this->__('bz_frnt_info');
       echo Mage::getModel('barzahlen/barzahlen')->getConfigData('sandbox') ? "<br/><br/>".$this->__('bz_frnt_sandbox') : null;
-      echo "<br/><br/>".$this->__('bz_frnt_partner')."<br/>";
+      echo "<br/><br/>".$this->__('bz_frnt_partner')."&nbsp;";
       for($i = 1; $i <= 10; $i++) {
         $count = str_pad($i,2,"0",STR_PAD_LEFT);
-        echo '<img src="http://cdn.barzahlen.de/images/barzahlen_partner_'.$count.'.png" alt="" />';
+        echo '<img src="http://cdn.barzahlen.de/images/barzahlen_partner_'.$count.'.png" alt="" style="vertical-align: middle; height: 25px;" />';
       }
     ?>
     <br /><br />

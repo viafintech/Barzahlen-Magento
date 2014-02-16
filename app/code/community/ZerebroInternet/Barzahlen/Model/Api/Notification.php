@@ -167,11 +167,15 @@ class ZerebroInternet_Barzahlen_Model_Api_Notification extends ZerebroInternet_B
    */
   public function getNotificationArray($attribute = '') {
 
-    if($attribute != '') {
-      return array_key_exists($attribute, $this->_receivedData) && $this->_isValid ? $this->_receivedData[$attribute] : null;
+    if(!$this->_isValid) {
+      return null;
     }
 
-    return $this->_isValid ? $this->_receivedData : null;
+    if($attribute != '') {
+      return array_key_exists($attribute, $this->_receivedData) ? $this->_receivedData[$attribute] : null;
+    }
+
+    return $this->_receivedData;
   }
 
   /**

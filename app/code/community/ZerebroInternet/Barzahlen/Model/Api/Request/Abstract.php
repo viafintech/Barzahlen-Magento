@@ -34,7 +34,7 @@ abstract class ZerebroInternet_Barzahlen_Model_Api_Request_Abstract extends Zere
    *
    * @return type of request
    */
-  final public function getRequestType() {
+  public function getRequestType() {
     return $this->_type;
   }
 
@@ -43,7 +43,7 @@ abstract class ZerebroInternet_Barzahlen_Model_Api_Request_Abstract extends Zere
    *
    * @return boolean if request response is valid
    */
-  final public function isValid() {
+  public function isValid() {
     return $this->_isValid;
   }
 
@@ -53,7 +53,7 @@ abstract class ZerebroInternet_Barzahlen_Model_Api_Request_Abstract extends Zere
    * @param string $attribute single attribute, that shall be returned
    * @return single value if exists (else: null) or whole array
    */
-  final public function getXmlArray($attribute = '') {
+  public function getXmlArray($attribute = '') {
 
     if($attribute != '') {
       return array_key_exists($attribute, $this->_xmlData) ? $this->_xmlData[$attribute] : null;
@@ -69,13 +69,18 @@ abstract class ZerebroInternet_Barzahlen_Model_Api_Request_Abstract extends Zere
    * @param string $paymentKey merchants payment key
    * @return array with parsed xml data
    */
-  final public function parseXml($xmlResponse, $paymentKey) {
+  public function parseXml($xmlResponse, $paymentKey) {
 
     if(!is_string($xmlResponse) || $xmlResponse == '') {
       Mage::throwException('No valid xml response received.');
     }
 
-    $this->_xmlObj = new SimpleXMLElement($xmlResponse);
+    try {
+      $this->_xmlObj = new SimpleXMLElement($xmlResponse);
+    }
+    catch(Exception $e) {
+      throw new Barzahlen_Exception($e->getMessage());
+    }
 
     $this->_getXmlError();
     $this->_getXmlAttributes();
@@ -86,7 +91,7 @@ abstract class ZerebroInternet_Barzahlen_Model_Api_Request_Abstract extends Zere
   /**
    * Checks if an error occurred.
    */
-  final protected function _getXmlError() {
+  protected function _getXmlError() {
 
     if($this->_xmlObj->{'result'} != 0) {
       Mage::throwException('XML response contains an error: ' . $this->_xmlObj->{'error-message'});
@@ -98,7 +103,7 @@ abstract class ZerebroInternet_Barzahlen_Model_Api_Request_Abstract extends Zere
    *
    * @param string $responseType type for xml response
    */
-  final protected function _getXmlAttributes() {
+  protected function _getXmlAttributes() {
 
     $this->_xmlData = array();
 
@@ -112,7 +117,7 @@ abstract class ZerebroInternet_Barzahlen_Model_Api_Request_Abstract extends Zere
    *
    * @param string $paymentKey merchants payment key
    */
-  final protected function _checkXmlHash($paymentKey) {
+  protected function _checkXmlHash($paymentKey) {
 
     $receivedHash = $this->_xmlData['hash'];
     unset($this->_xmlData['hash']);

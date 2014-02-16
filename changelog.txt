@@ -1,3 +1,6 @@
+==1.1.1 (29.01.2013)==
+* redesigned payment selection and checkout success page
+
 ==1.1.0 (31.10.2012)==
 * implemented new api geocoding feature to get the closest points of sales
 * reduced the maximum amount to 999.99 Euros

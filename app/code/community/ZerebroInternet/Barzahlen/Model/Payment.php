@@ -133,10 +133,7 @@ class ZerebroInternet_Barzahlen_Model_Payment extends ZerebroInternet_Barzahlen_
 
     $session = Mage::getSingleton('checkout/session');
     $session->setResponse('200');
-    $session->setBzPaymentSlipLink($xmlArray['payment-slip-link']);
-    $session->setBzExpirationNote($xmlArray['expiration-notice']);
     $session->setBzInfotext1($xmlArray['infotext-1']);
-    $session->setBzInfotext2($xmlArray['infotext-2']);
     $session->getQuote()->setIsActive(false)->save();
 
     $order->getPayment()->setAdditionalInformation('transaction_id', $xmlArray['transaction-id']);
