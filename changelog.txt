@@ -1,3 +1,6 @@
+==1.1.5 (12.03.2013)==
+* enabled all settings for store views
+
 ==1.1.4 (11.03.2013)==
 * changed image urls to make use of https
 * updated cURL certificate bundle

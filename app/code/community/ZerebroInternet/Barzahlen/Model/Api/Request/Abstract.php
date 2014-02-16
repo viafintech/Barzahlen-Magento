@@ -79,7 +79,7 @@ abstract class ZerebroInternet_Barzahlen_Model_Api_Request_Abstract extends Zere
       $this->_xmlObj = new SimpleXMLElement($xmlResponse);
     }
     catch(Exception $e) {
-      throw new Barzahlen_Exception($e->getMessage());
+      Mage::throwException($e->getMessage());
     }
 
     $this->_getXmlError();

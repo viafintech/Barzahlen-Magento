@@ -41,7 +41,7 @@
               <sort_order>1</sort_order>
               <show_in_default>1</show_in_default>
               <show_in_website>1</show_in_website>
-              <show_in_store>0</show_in_store>
+              <show_in_store>1</show_in_store>
             </active>
             <sandbox translate="label">
               <label>bz_adm_sandbox_title</label>
@@ -51,7 +51,7 @@
               <sort_order>2</sort_order>
               <show_in_default>1</show_in_default>
               <show_in_website>1</show_in_website>
-              <show_in_store>0</show_in_store>
+              <show_in_store>1</show_in_store>
             </sandbox>
             <title translate="label">
               <backend_model>barzahlen/adminexceptions_title</backend_model>
@@ -80,7 +80,7 @@
               <sort_order>5</sort_order>
               <show_in_default>1</show_in_default>
               <show_in_website>1</show_in_website>
-              <show_in_store>0</show_in_store>
+              <show_in_store>1</show_in_store>
             </shop_id>
             <payment_key translate="label">
               <backend_model>barzahlen/adminexceptions_paymentkey</backend_model>
@@ -90,7 +90,7 @@
               <sort_order>6</sort_order>
               <show_in_default>1</show_in_default>
               <show_in_website>1</show_in_website>
-              <show_in_store>0</show_in_store>
+              <show_in_store>1</show_in_store>
             </payment_key>
             <notification_key translate="label">
               <backend_model>barzahlen/adminexceptions_notificationkey</backend_model>
@@ -100,7 +100,7 @@
               <sort_order>7</sort_order>
               <show_in_default>1</show_in_default>
               <show_in_website>1</show_in_website>
-              <show_in_store>0</show_in_store>
+              <show_in_store>1</show_in_store>
             </notification_key>
             <custom_var_0 translate="label">
               <label>bz_adm_customvar0_title</label>
@@ -134,7 +134,7 @@
               <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
               <show_in_default>1</show_in_default>
               <show_in_website>1</show_in_website>
-              <show_in_store>0</show_in_store>
+              <show_in_store>1</show_in_store>
             </allowspecific>
             <specificcountry translate="label">
               <backend_model>barzahlen/adminexceptions_specificcountry</backend_model>
@@ -145,7 +145,7 @@
               <source_model>adminhtml/system_config_source_country</source_model>
               <show_in_default>1</show_in_default>
               <show_in_website>1</show_in_website>
-              <show_in_store>0</show_in_store>
+              <show_in_store>1</show_in_store>
               <can_be_empty>1</can_be_empty>
             </specificcountry>
             <max_order_total translate="label">
@@ -175,7 +175,7 @@
               <sort_order>100</sort_order>
               <show_in_default>1</show_in_default>
               <show_in_website>1</show_in_website>
-              <show_in_store>0</show_in_store>
+              <show_in_store>1</show_in_store>
             </debug>
           </fields>
         </barzahlen>
