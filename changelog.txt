@@ -1,3 +1,6 @@
+==1.1.2 (19.02.2013)==
+* added automatic iso conversion for payment requests
+
 ==1.1.1 (29.01.2013)==
 * redesigned payment selection and checkout success page
 
