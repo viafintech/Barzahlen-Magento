@@ -40,11 +40,12 @@ class ZerebroInternet_Barzahlen_Model_Check extends ZerebroInternet_Barzahlen_Mo
                 $config->saveConfig('payment/barzahlen/last_check', time(), 'default', 0);
                 Mage::getConfig()->cleanCache();
                 $barzahlen = Mage::getSingleton('barzahlen/barzahlen');
-                $transArray['shop_id'] = $barzahlen->getConfigData('shop_id');
+                $transArray['shop_id'] = $barzahlen->getConfigData('shop_id') != null ? $barzahlen->getConfigData('shop_id') : $barzahlen->getConfigData('shop_id', 1);
                 $transArray['shopsystem'] = 'Magento';
                 $transArray['shopsystem_version'] = Mage::getVersion();
                 $transArray['plugin_version'] = (string) Mage::getConfig()->getNode()->modules->ZerebroInternet_Barzahlen->version;
-                $transArray['hash'] = $this->_createHash($transArray, $barzahlen->getConfigData('payment_key'));
+                $paymentKey = $barzahlen->getConfigData('payment_key') != null ? $barzahlen->getConfigData('payment_key') : $barzahlen->getConfigData('payment_key', 1);
+                $transArray['hash'] = $this->_createHash($transArray, $paymentKey);
 
                 $currentVersion = $this->_requestVersion($transArray);
                 if ($currentVersion != false) {

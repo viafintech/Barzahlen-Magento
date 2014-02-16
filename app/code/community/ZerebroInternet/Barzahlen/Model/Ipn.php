@@ -100,17 +100,6 @@ class ZerebroInternet_Barzahlen_Model_Ipn
             return false;
         }
 
-        if (isset($this->_receivedData['order_id'])) {
-            if (round($this->_order->getGrandTotal(), 2) != round($this->_receivedData['amount'], 2)) {
-                Mage::helper('barzahlen')->bzLog('controller/ipn: order total amount doesn\'t match', $this->_receivedData);
-                return false;
-            }
-            if ($this->_order->getOrderCurrencyCode() != $this->_receivedData['currency']) {
-                Mage::helper('barzahlen')->bzLog('controller/ipn: order currency doesn\'t match', $this->_receivedData);
-                return false;
-            }
-        }
-
         $transactionId = isset($this->_receivedData['origin_transaction_id']) ? $this->_receivedData['origin_transaction_id'] : $this->_receivedData['transaction_id'];
         if ($transactionId != $this->_order->getPayment()->getAdditionalInformation('transaction_id')) {
             Mage::helper('barzahlen')->bzLog('controller/ipn: Unable to find the transaction id in the given order', $this->_receivedData);
@@ -204,14 +193,6 @@ class ZerebroInternet_Barzahlen_Model_Ipn
             if ($creditmemo->getTransactionId() == $this->_receivedData['refund_transaction_id']) {
                 if ($creditmemo->getState() != Mage_Sales_Model_Order_Creditmemo::STATE_OPEN) {
                     Mage::helper('barzahlen')->bzLog('controller/ipn: credit memo already refunded / closed', $this->_receivedData);
-                    return false;
-                }
-                if ($creditmemo->getGrandTotal() != $this->_receivedData['amount']) {
-                    Mage::helper('barzahlen')->bzLog('controller/ipn: credit memo total amount doesn\'t match', $this->_receivedData);
-                    return false;
-                }
-                if ($creditmemo->getOrderCurrencyCode() != $this->_receivedData['currency']) {
-                    Mage::helper('barzahlen')->bzLog('controller/ipn: credit memo currency doesn\'t match', $this->_receivedData);
                     return false;
                 }
                 $this->_creditmemo = $creditmemo;

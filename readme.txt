@@ -6,7 +6,7 @@ Barzahlen Payment Module (Magento)
 http://www.barzahlen.de
 
 ==Current Version==
-1.2.0
+1.2.1
 
 ==User Manual==
 http://www.barzahlen.de/partner/integration/shopsysteme/2/magento

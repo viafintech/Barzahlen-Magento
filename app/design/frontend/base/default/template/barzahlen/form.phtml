@@ -25,6 +25,8 @@
 <ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none">
   <li>
     <?php
+      echo '<div>';
+      echo '<img src="https://cdn.barzahlen.de/images/barzahlen_special.png" style="float: right; margin-left: 10px; max-width: 180px; max-height: 180px;">';
       echo $this->__('bz_frnt_info');
       echo Mage::getModel('barzahlen/barzahlen')->getConfigData('sandbox') ? "<br/><br/>".$this->__('bz_frnt_sandbox') : null;
       echo "<br/><br/>".$this->__('bz_frnt_partner')."&nbsp;";
@@ -32,6 +34,7 @@
         $count = str_pad($i,2,"0",STR_PAD_LEFT);
         echo '<img src="https://cdn.barzahlen.de/images/barzahlen_partner_'.$count.'.png" alt="" style="vertical-align: middle; height: 25px;" />';
       }
+      echo '</div>';
     ?>
     <br /><br />
   </li>

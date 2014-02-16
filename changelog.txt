@@ -1,3 +1,6 @@
+==1.2.1 (25.06.2013)==
+* fixed automatic version check for multi store installations
+
 ==1.2.0 (25.04.2013)==
 * implemented automatic plugin version check (weekly)
 * using PSR2 coding standard
