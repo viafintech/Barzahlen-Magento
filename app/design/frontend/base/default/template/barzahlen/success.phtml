@@ -11,4 +11,7 @@
  */
 ?>
 
-<img id="barzahlen_logo" src="https://cdn.barzahlen.de/images/barzahlen_logo.png" alt="Barzahlen" style="vertical-align: middle; height: 45px;">
+<?php
+  echo $this->getBarzahlenInfotext();
+  echo $this->getChildHtml('child');
+?>

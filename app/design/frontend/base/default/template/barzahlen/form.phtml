@@ -1,42 +1,30 @@
 <?php
 /**
- * Barzahlen Payment Module
- *
- * NOTICE OF LICENSE
- *
- * This source file is subject to the Open Software License (OSL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to info@barzahlen.de so we can send you a copy immediately.
+ * Barzahlen Payment Module for Magento
  *
  * @category    ZerebroInternet
  * @package     ZerebroInternet_Barzahlen
- * @copyright   Copyright (c) 2012 Zerebro Internet GmbH (http://www.barzahlen.de)
- * @author      Martin Seener
+ * @copyright   Copyright (c) 2014 Cash Payment Solutions GmbH (https://www.barzahlen.de)
  * @author      Alexander Diebler
+ * @author      Martin Seener
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL-3.0)
  */
-
 ?>
+
 <?php $_code = $this->getMethodCode(); ?>
 <ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none">
   <li>
     <?php
-      echo '<div>';
-      echo '<img src="https://cdn.barzahlen.de/images/barzahlen_special.png" style="float: right; margin-left: 10px; max-width: 180px; max-height: 180px;">';
-      echo $this->__('bz_frnt_info');
-      echo Mage::getModel('barzahlen/barzahlen')->getConfigData('sandbox') ? "<br/><br/>".$this->__('bz_frnt_sandbox') : null;
-      echo "<br/><br/>".$this->__('bz_frnt_partner')."&nbsp;";
+      echo '<div id="barzahlen_description">';
+      echo '<img id="barzahlen_special" src="https://cdn.barzahlen.de/images/barzahlen_special.png" style="float: right; margin-left: 10px; max-width: 180px; max-height: 180px;">';
+      echo $this->__('bz_frnt_info') . "<br><br>";
+      echo $this->__('bz_frnt_partner') . "&nbsp;";
       for($i = 1; $i <= 10; $i++) {
         $count = str_pad($i,2,"0",STR_PAD_LEFT);
-        echo '<img src="https://cdn.barzahlen.de/images/barzahlen_partner_'.$count.'.png" alt="" style="vertical-align: middle; height: 25px;" />';
+        echo '<img src="https://cdn.barzahlen.de/images/barzahlen_partner_'.$count.'.png" alt="" style="vertical-align: middle; height: 25px; display: inline-block;">';
       }
       echo '</div>';
     ?>
-    <br /><br />
   </li>
 </ul>
-
+<script src="https://cdn.barzahlen.de/js/selection.js"></script>

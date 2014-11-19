@@ -27,9 +27,6 @@ class ZerebroInternet_Barzahlen_Test_Model_Barzahlen extends EcomDev_PHPUnit_Tes
     $this->assertAttributeEquals(true, '_canUseInternal', $this->object);
     $this->assertAttributeEquals(true, '_canUseCheckout', $this->object);
     $this->assertAttributeEquals(true, '_canUseForMultishipping', $this->object);
-
-    // Test if the Payment Processing URL is given correctly
-    $this->assertAttributeEquals('barzahlen/checkout/processing', '_redirectProcessingUrl', $this->object);
   }
 
   /**

@@ -1,12 +1,19 @@
 # Barzahlen Payment Module (Magento)
 
 ## User Manual
-https://integration.barzahlen.de/de/shopsysteme/magento/nutzerhandbuch
+DE - https://integration.barzahlen.de/de/shopsysteme/magento/nutzerhandbuch  
+EN - https://integration.barzahlen.de/en/shopsystems/magento/user-manual
 
 ## Current Version
-1.2.1
+1.3.0
 
 ## Changelog
+
+### 1.3.0 (19.11.2014)
+* integrated Barzahlen transactions better with Magento transactions
+* avoiding overwriting other buttons in adminhtml/sales_order_view
+* improved payment selection and api communication
+* updated Barzahlen API PHP SDK
 
 ### 1.2.1 (25.06.2013)
 * fixed automatic version check for multi store installations
@@ -54,7 +61,7 @@ https://integration.barzahlen.de/de/shopsysteme/magento/nutzerhandbuch
 * initial release
 
 ## Support
-The Barzahlen Team will happily assist you with any problems or questions. Send us an email to support@barzahlen.de or use the contact form at http://www.barzahlen.de/partner/integration.
+The Barzahlen Team will happily assist you with any problems or questions. Send us an email to support@barzahlen.de or use the contact form at https://integration.barzahlen.de/en/support.
 
 ## Copyright
 (c) 2014, Cash Payment Solutions GmbH  

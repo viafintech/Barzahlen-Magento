@@ -93,3 +93,11 @@ tables:
       qty_ordered: 6
       qty_refunded: 0
       qty_shipped: 0
+  sales/payment_transaction:
+    - transaction_id: 4
+      order_id: 4
+      payment_id: 4
+      txn_id: 4
+      txn_type: order
+      is_closed: 1
+      created_at: 2012-04-01 14:00:00

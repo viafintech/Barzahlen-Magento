@@ -57,11 +57,11 @@ class ZerebroInternet_Barzahlen_Test_Controller_ResendController extends EcomDev
     $this->replaceByMock('model','sales/order',$order);
 
     // mock resend
-    $resend = $this->getModelMock('barzahlen/resend', array('resend'));
+    $resend = $this->getModelMock('barzahlen/barzahlen', array('resendSlip'));
     $resend->expects($this->once())
-           ->method('resend')
+           ->method('resendSlip')
            ->will($this->returnValue(true));
-    $this->replaceByMock('singleton','barzahlen/resend',$resend);
+    $this->replaceByMock('singleton','barzahlen/barzahlen',$resend);
 
     $this->object->paymentAction();
     $this->assertEquals('adminhtml/sales_order/view', $this->object->redirectUrl);
@@ -90,11 +90,11 @@ class ZerebroInternet_Barzahlen_Test_Controller_ResendController extends EcomDev
     $this->replaceByMock('model','sales/order',$order);
 
     // mock resend
-    $resend = $this->getModelMock('barzahlen/resend', array('resend'));
+    $resend = $this->getModelMock('barzahlen/barzahlen', array('resendSlip'));
     $resend->expects($this->once())
-           ->method('resend')
+           ->method('resendSlip')
            ->will($this->returnValue(false));
-    $this->replaceByMock('singleton','barzahlen/resend',$resend);
+    $this->replaceByMock('singleton','barzahlen/barzahlen',$resend);
 
     $this->object->paymentAction();
     $this->assertEquals('adminhtml/sales_order/view', $this->object->redirectUrl);
@@ -120,14 +120,14 @@ class ZerebroInternet_Barzahlen_Test_Controller_ResendController extends EcomDev
     $this->replaceByMock('model','sales/order_creditmemo',$cmemo);
 
     // mock resend
-    $resend = $this->getModelMock('barzahlen/resend', array('resend'));
+    $resend = $this->getModelMock('barzahlen/barzahlen', array('resendSlip'));
     $resend->expects($this->once())
-           ->method('resend')
+           ->method('resendSlip')
            ->will($this->returnValue(true));
-    $this->replaceByMock('singleton','barzahlen/resend',$resend);
+    $this->replaceByMock('singleton','barzahlen/barzahlen',$resend);
 
     $this->object->refundAction();
-    $this->assertEquals('adminhtml/sales_creditmemo/view', $this->object->redirectUrl);
+    $this->assertEquals('adminhtml/sales_order_creditmemo/view', $this->object->redirectUrl);
     $this->assertEquals(array('creditmemo_id' => '100000005'), $this->object->redirectArray);
   }
 
@@ -150,14 +150,14 @@ class ZerebroInternet_Barzahlen_Test_Controller_ResendController extends EcomDev
     $this->replaceByMock('model','sales/order_creditmemo',$cmemo);
 
     // mock resend
-    $resend = $this->getModelMock('barzahlen/resend', array('resend'));
+    $resend = $this->getModelMock('barzahlen/barzahlen', array('resendSlip'));
     $resend->expects($this->once())
-           ->method('resend')
+           ->method('resendSlip')
            ->will($this->returnValue(false));
-    $this->replaceByMock('singleton','barzahlen/resend',$resend);
+    $this->replaceByMock('singleton','barzahlen/barzahlen',$resend);
 
     $this->object->refundAction();
-    $this->assertEquals('adminhtml/sales_creditmemo/view', $this->object->redirectUrl);
+    $this->assertEquals('adminhtml/sales_order_creditmemo/view', $this->object->redirectUrl);
     $this->assertEquals(array('creditmemo_id' => '100000005'), $this->object->redirectArray);
   }
 

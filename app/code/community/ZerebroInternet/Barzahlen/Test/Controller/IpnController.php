@@ -17,6 +17,10 @@ class ZerebroInternet_Barzahlen_IpnController_Mock extends ZerebroInternet_Barza
   public function getQuery() {
     return $this->_request;
   }
+
+  public function returnHeader($code) {
+    return null;
+  }
 }
 
 class ZerebroInternet_Barzahlen_Test_Controller_IpnController extends EcomDev_PHPUnit_Test_Case_Controller {
@@ -107,18 +111,12 @@ class ZerebroInternet_Barzahlen_Test_Controller_IpnController extends EcomDev_PH
                   'hash' => '6a227d559521476b024468c181923e9af7d146d14f435ecd9d02bb87c95f8b21f81dcd6128f717f894c927c820a6d6e8841f52005397924ea8bd23d76eda7274'
                  );
 
-    $create = $this->getModelMock('sales/order_invoice_api', array('create'));
-    $create->expects($this->once())
-           ->method('create')
-           ->will($this->returnCallback(array($this, 'invoiceHelper')));
-    $this->replaceByMock('model','sales/order_invoice_api',$create);
-
     $this->object = new ZerebroInternet_Barzahlen_IpnController_Mock;
     $this->object->indexAction();
 
     $order = Mage::getModel('sales/order')->loadByIncrementId('100000003');
     $this->assertEquals('processing', $order->getState());
-    //$this->assertEquals('processing', $order->getStatus());
+    $this->assertEquals('processing', $order->getStatus());
   }
 
   /**
@@ -338,16 +336,6 @@ class ZerebroInternet_Barzahlen_Test_Controller_IpnController extends EcomDev_PH
     $order = Mage::getModel('sales/order')->loadByIncrementId('100000005');
     $this->assertEquals('closed', $order->getState());
     $this->assertEquals('closed', $order->getstate());
-    $this->assertEquals(null, $order->getTotalOfflineRefunded());
-    $this->assertEquals(null, $order->getBaseTotalOfflineRefunded());
-    $this->assertEquals(null, $order->getTotalOfflineRefunded());
-    $this->assertEquals(null, $order->getBaseTotalOfflineRefunded());
-    $this->assertEquals(null, $order->getBaseSubtotalRefunded());
-    $this->assertEquals(null, $order->getSubtotalRefunded());
-    $this->assertEquals(null, $order->getBaseTaxRefunded());
-    $this->assertEquals(null, $order->getTaxRefunded());
-    $this->assertEquals(null, $order->getBaseShippingRefunded());
-    $this->assertEquals(null, $order->getShippingRefunded());
 
     $collection = Mage::getResourceModel('sales/order_creditmemo_collection')
                   ->addAttributeToFilter('order_id', array('eq' => $order->getEntityId()))
@@ -355,7 +343,7 @@ class ZerebroInternet_Barzahlen_Test_Controller_IpnController extends EcomDev_PH
     foreach ($collection as $cm) {
       $creditmemo = $cm;
     }
-    $this->assertEquals('3', $creditmemo->getState());
+    $this->assertEquals('2', $creditmemo->getState());
   }
 
   /**
@@ -431,7 +419,7 @@ class ZerebroInternet_Barzahlen_Test_Controller_IpnController extends EcomDev_PH
     foreach ($collection as $cm) {
       $creditmemo = $cm;
     }
-    $this->assertEquals('1', $creditmemo->getState());
+    $this->assertEquals('2', $creditmemo->getState());
   }
 
   /**
@@ -442,9 +430,9 @@ class ZerebroInternet_Barzahlen_Test_Controller_IpnController extends EcomDev_PH
    */
   public function testIpnExceptionHandling() {
 
-    $create = $this->getModelMock('barzahlen/ipn', array('sendResponseHeader'));
+    $create = $this->getModelMock('barzahlen/ipn', array('isDataValid'));
     $create->expects($this->once())
-           ->method('sendResponseHeader')
+           ->method('isDataValid')
            ->will($this->throwException(new Mage_Core_Exception('An error occurred.')));
     $this->replaceByMock('model','barzahlen/ipn',$create);
 

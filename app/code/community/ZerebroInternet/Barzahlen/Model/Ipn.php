@@ -1,22 +1,12 @@
 <?php
 /**
- * Barzahlen Payment Module
- *
- * NOTICE OF LICENSE
- *
- * This source file is subject to the Open Software License (OSL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to info@barzahlen.de so we can send you a copy immediately.
+ * Barzahlen Payment Module for Magento
  *
  * @category    ZerebroInternet
  * @package     ZerebroInternet_Barzahlen
- * @copyright   Copyright (c) 2013 Zerebro Internet GmbH (http://www.barzahlen.de)
- * @author      Martin Seener
+ * @copyright   Copyright (c) 2014 Cash Payment Solutions GmbH (https://www.barzahlen.de)
  * @author      Alexander Diebler
+ * @author      Martin Seener
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL-3.0)
  */
 
@@ -37,11 +27,16 @@ class ZerebroInternet_Barzahlen_Model_Ipn
     protected $_order;
 
     /**
-     * Corresponding Credit Memo
+     * Barzahlen payment state possible values
      *
-     * @var Mage_Sales_Model_Order_Creditmemo
+     * @var string
      */
-    protected $_creditmemo;
+    const PAYMENTSTATE_PENDING = 'pending';
+    const PAYMENTSTATE_PAID = 'paid';
+    const PAYMENTSTATE_EXPIRED = 'expired';
+    const PAYMENTSTATE_REFUND_PENDING = 'refund_pending';
+    const PAYMENTSTATE_REFUND_COMPLETED = 'refund_completed';
+    const PAYMENTSTATE_REFUND_EXPIRED = 'refund_expired';
 
     /**
      * Checks received data and validates hash.
@@ -50,8 +45,7 @@ class ZerebroInternet_Barzahlen_Model_Ipn
      * @return TRUE if received get array is valid and hash could be confirmed
      * @return FALSE if an error occurred
      */
-
-    public function sendResponseHeader($ipnData)
+    public function isDataValid($ipnData)
     {
         $barzahlen = Mage::getModel('barzahlen/barzahlen');
         $shopId = $barzahlen->getConfigData('shop_id');
@@ -80,10 +74,11 @@ class ZerebroInternet_Barzahlen_Model_Ipn
         $orderId = isset($this->_receivedData['origin_order_id']) ? $this->_receivedData['origin_order_id'] : $this->_receivedData['order_id'];
         $this->_order = Mage::getModel('sales/order')->loadByIncrementId($orderId);
 
-        if ($this->_checkOrderInformation()) {
-            if ($this->_handleStateChange()) {
-                $this->_order->save();
-            }
+        if ($this->_checkOrderInformation() && $this->_handleStateChange()) {
+            $this->_order->save();
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -115,17 +110,14 @@ class ZerebroInternet_Barzahlen_Model_Ipn
     protected function _handleStateChange()
     {
         switch ($this->_receivedData['state']) {
-            case ZerebroInternet_Barzahlen_Model_Barzahlen::PAYMENTSTATE_PAID:
+            case self::PAYMENTSTATE_PAID:
                 $this->_processTransactionPaid();
                 return true;
-            case ZerebroInternet_Barzahlen_Model_Barzahlen::PAYMENTSTATE_EXPIRED:
+            case self::PAYMENTSTATE_EXPIRED:
                 $this->_processTransactionExpired();
                 return true;
-            case ZerebroInternet_Barzahlen_Model_Barzahlen::PAYMENTSTATE_REFUND_COMPLETED:
-                $this->_processRefundCompleted();
-                return true;
-            case ZerebroInternet_Barzahlen_Model_Barzahlen::PAYMENTSTATE_REFUND_EXPIRED:
-                $this->_processRefundExpired();
+            case self::PAYMENTSTATE_REFUND_COMPLETED:
+            case self::PAYMENTSTATE_REFUND_EXPIRED:
                 return true;
             default:
                 Mage::helper('barzahlen')->bzLog('controller/ipn: Cannot handle payment state', $this->_receivedData);
@@ -138,69 +130,27 @@ class ZerebroInternet_Barzahlen_Model_Ipn
      */
     protected function _processTransactionPaid()
     {
-        if (!$this->_order->canInvoice()) {
+        if(!$this->_order->canInvoice()) {
             return;
         }
 
-        Mage::getModel('sales/order_invoice_api')->create($this->_order->getIncrementId(), array(), $this->_createIpnComment(), true, true);
+        $payment = $this->_order->getPayment();
+        $payment->setTransactionId($this->_receivedData['transaction_id'])
+            ->setCurrencyCode($this->_receivedData['currency'])
+            ->setPreparedMessage($this->_createIpnComment())
+            ->setIsTransactionClosed(1)
+            ->registerCaptureNotification($this->_receivedData['amount']);
     }
 
     /**
-     * Cancels an order after the period of ten days elasped.
+     * Cancels an order after the period for payment elapsed.
      */
     protected function _processTransactionExpired()
     {
+        $payment = $this->_order->getPayment();
+        $payment->getTransaction($this->_receivedData['transaction_id'])->close();
         $this->_order->registerCancellation($this->_createIpnComment(), false)->save();
         $this->_order->sendOrderUpdateEmail(true, $this->_createIpnComment());
-    }
-
-    /**
-     * Update order state after refund was completed successful.
-     */
-    protected function _processRefundCompleted()
-    {
-        if ($this->_getCreditmemo()) {
-            $this->_creditmemo->setState(Mage_Sales_Model_Order_Creditmemo::STATE_REFUNDED);
-            $this->_creditmemo->addComment($this->_createIpnComment(), false, true);
-            $this->_creditmemo->save();
-        }
-    }
-
-    /**
-     * Sets an order be to completed after the period of thrity days for the refund elasped.
-     */
-    protected function _processRefundExpired()
-    {
-        if ($this->_getCreditmemo()) {
-            $this->_creditmemo->setState(Mage_Sales_Model_Order_Creditmemo::STATE_CANCELED);
-            $this->_creditmemo->addComment($this->_createIpnComment(), false, true);
-            $this->_rollbackCreditmemo();
-            $this->_creditmemo->save();
-        }
-    }
-
-    /**
-     * Get requested credit memo from the database.
-     *
-     * @return TURE if credit memo was found with refund_transaction_id
-     * @return FALSE if no credit memo was found
-     */
-    protected function _getCreditmemo()
-    {
-        $creditmemos = $this->_order->getCreditmemosCollection();
-
-        foreach ($creditmemos as $creditmemo)
-            if ($creditmemo->getTransactionId() == $this->_receivedData['refund_transaction_id']) {
-                if ($creditmemo->getState() != Mage_Sales_Model_Order_Creditmemo::STATE_OPEN) {
-                    Mage::helper('barzahlen')->bzLog('controller/ipn: credit memo already refunded / closed', $this->_receivedData);
-                    return false;
-                }
-                $this->_creditmemo = $creditmemo;
-                return true;
-            }
-
-        Mage::helper('barzahlen')->bzLog('controller/ipn: Unable to find requested creditmemo by refund_transaction_id', $this->_receivedData);
-        return false;
     }
 
     /**
@@ -210,80 +160,7 @@ class ZerebroInternet_Barzahlen_Model_Ipn
      */
     protected function _createIpnComment()
     {
-        $paymentState = $this->_receivedData['state'];
-        $message = Mage::helper('barzahlen')->__('bz_frnt_ipn_' . $paymentState);
+        $message = Mage::helper('barzahlen')->__('bz_frnt_ipn_' . $this->_receivedData['state']);
         return $message;
-    }
-
-    /**
-     * Performs rollback process when a refund is expired.
-     */
-    protected function _rollbackCreditmemo()
-    {
-        $this->_rollbackOrderItems();
-        $this->_rollbackOrderStats();
-        $this->_setNullforZero();
-
-        $this->_order->getPayment()->cancelCreditmemo($this->_creditmemo);
-    }
-
-    /**
-     * Sets back the quantity of the order items after a refund expired. Imitates
-     * Mage_Sales_Model_Order_Item->cancel() since that function doesn't work the expected way.
-     * (Magento v.1.6.1.0)
-     */
-    protected function _rollbackOrderItems()
-    {
-        foreach ($this->_creditmemo->getAllItems() as $item) {
-            $item->getOrderItem()->setQtyRefunded($item->getOrderItem()->getQtyRefunded() - $item->getQty())->save();
-        }
-        $this->_creditmemo->save();
-    }
-
-    /**
-     * Sets back order information to the state before the credit memo. Imitates
-     * Mage_Sales_Model_Order_Creditmemo->cancel() since that function doesn't work the expected way.
-     * (Magento v.1.6.1.0)
-     */
-    protected function _rollbackOrderStats()
-    {
-        $this->_order->setTotalOfflineRefunded($this->_order->getTotalOfflineRefunded() - $this->_creditmemo->getGrandTotal());
-        $this->_order->setBaseTotalOfflineRefunded($this->_order->getBaseTotalOfflineRefunded() - $this->_creditmemo->getBaseGrandTotal());
-        $this->_order->setTotalRefunded($this->_order->getTotalOfflineRefunded() + $this->_order->getTotalOnlineRefunded());
-        $this->_order->setBaseTotalRefunded($this->_order->getBaseTotalOfflineRefunded() + $this->_order->getBaseTotalOnlineRefunded());
-        $this->_order->setBaseSubtotalRefunded($this->_order->getBaseSubtotalRefunded() - $this->_creditmemo->getBaseSubtotal());
-        $this->_order->setSubtotalRefunded($this->_order->getSubtotalRefunded() - $this->_creditmemo->getSubtotal());
-        $this->_order->setBaseTaxRefunded($this->_order->getBaseTaxRefunded() - $this->_creditmemo->getBaseTaxAmount());
-        $this->_order->setTaxRefunded($this->_order->getTaxRefunded() - $this->_creditmemo->getTaxAmount());
-        $this->_order->setBaseShippingRefunded($this->_order->getBaseShippingRefunded() - $this->_creditmemo->getBaseShippingAmount());
-        $this->_order->setShippingRefunded($this->_order->getShippingRefunded() - $this->_creditmemo->getShippingAmount());
-    }
-
-    /**
-     * Replaces 0 by null to avoid automatic state setting by Mage_Sales_Model_Order after complete
-     * refund rollback.
-     */
-    protected function _setNullforZero()
-    {
-        if ($this->_order->getTotalOfflineRefunded() <= 0)
-            $this->_order->setTotalOfflineRefunded(null);
-        if ($this->_order->getBaseTotalOfflineRefunded() <= 0)
-            $this->_order->setBaseTotalOfflineRefunded(null);
-        if ($this->_order->getTotalOfflineRefunded() <= 0)
-            $this->_order->setTotalRefunded(null);
-        if ($this->_order->getBaseTotalOfflineRefunded() <= 0)
-            $this->_order->setBaseTotalRefunded(null);
-        if ($this->_order->getBaseSubtotalRefunded() <= 0)
-            $this->_order->setBaseSubtotalRefunded(null);
-        if ($this->_order->getSubtotalRefunded() <= 0)
-            $this->_order->setSubtotalRefunded(null);
-        if ($this->_order->getBaseTaxRefunded() <= 0)
-            $this->_order->setBaseTaxRefunded(null);
-        if ($this->_order->getTaxRefunded() <= 0)
-            $this->_order->setTaxRefunded(null);
-        if ($this->_order->getBaseShippingRefunded() <= 0)
-            $this->_order->setBaseShippingRefunded(null);
-        if ($this->_order->getShippingRefunded() <= 0)
-            $this->_order->setShippingRefunded(null);
     }
 }

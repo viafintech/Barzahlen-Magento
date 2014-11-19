@@ -1,37 +1,17 @@
 <?php
 /**
- * Barzahlen Payment Module
- *
- * NOTICE OF LICENSE
- *
- * This source file is subject to the Open Software License (OSL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to info@barzahlen.de so we can send you a copy immediately.
+ * Barzahlen Payment Module for Magento
  *
  * @category    ZerebroInternet
  * @package     ZerebroInternet_Barzahlen
- * @copyright   Copyright (c) 2013 Zerebro Internet GmbH (http://www.barzahlen.de)
- * @author      Martin Seener
+ * @copyright   Copyright (c) 2014 Cash Payment Solutions GmbH (https://www.barzahlen.de)
  * @author      Alexander Diebler
+ * @author      Martin Seener
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL-3.0)
  */
 
 class ZerebroInternet_Barzahlen_Model_Barzahlen extends Mage_Payment_Model_Method_Abstract
 {
-    /**
-     * @const payment code
-     */
-    const PAYMENT_CODE = 'barzahlen';
-
-    /**
-     * @const file for all error log and debug data
-     */
-    const DEFAULT_LOG_FILE = 'barzahlen.log';
-
     /**
      * module code
      *
@@ -61,35 +41,16 @@ class ZerebroInternet_Barzahlen_Model_Barzahlen extends Mage_Payment_Model_Metho
     protected $_infoBlockType = 'barzahlen/info';
 
     /**
-     * processing url
-     *
-     * @var string
-     */
-    protected $_redirectProcessingUrl = 'barzahlen/checkout/processing';
-
-    /**
      * Availability options
      *
      * @var boolean
      */
-    protected $_canRefund = true; //!< Barzahlen transactions can be refunded
-    protected $_canRefundInvoicePartial = true; //!< refunds can be done partial
-    protected $_canUseInternal = true; //!< can be used in admin panel checkout
-    protected $_canUseCheckout = true; //!< can be used as method on onepage checkout
-    protected $_canUseForMultishipping = true; //!< can be used as method on multipage checkout
-
-    /**
-     * Barzahlen payment state possible values
-     *
-     * @var string
-     */
-    const PAYMENTSTATE_PENDING = 'pending'; //!< pending state (new order)
-    const PAYMENTSTATE_PAID = 'paid'; //!< paid state (processing order)
-    const PAYMENTSTATE_EXPIRED = 'expired'; //!< expired state (canceled order)
-    const PAYMENTSTATE_REFUND_PENDING = 'refund_pending'; //!< refund pending state (credit memo OPEN)
-    const PAYMENTSTATE_REFUND_COMPLETED = 'refund_completed'; //!< refund completed state (credit memo REFUNDED)
-    const PAYMENTSTATE_REFUND_EXPIRED = 'refund_expired'; //!< refund expired state (credit memo CANCELED)
-    const PAYMENTSTATE_TEXT_BLOCKS = 'bz_frnt_ipn_'; //!< text block prefix
+    protected $_canOrder = true;
+    protected $_canRefund = true;
+    protected $_canRefundInvoicePartial = true;
+    protected $_canUseInternal = true;
+    protected $_canUseCheckout = true;
+    protected $_canUseForMultishipping = true;
 
     /**
      * Constructs Barzahlen API object.
@@ -101,23 +62,135 @@ class ZerebroInternet_Barzahlen_Model_Barzahlen extends Mage_Payment_Model_Metho
         $shopId = $this->getConfigData('shop_id');
         $paymentKey = $this->getConfigData('payment_key');
         $sandbox = $this->getConfigData('sandbox');
+
         $barzahlenApi = Mage::getModel('barzahlen/api', array('shopId' => $shopId, 'paymentKey' => $paymentKey, 'sandbox' => $sandbox));
         $barzahlenApi->setLanguage(substr((Mage::getSingleton('core/locale')->getLocaleCode()), 0, 2));
-
-        if ($this->getConfigData('debug')) {
-            $barzahlenApi->setDebug(true, self::DEFAULT_LOG_FILE);
-        }
+        $barzahlenApi->setDebug($this->getConfigData('debug'), 'barzahlen.log');
+        $barzahlenApi->setUserAgent('Magento ' . Mage::getVersion() . ' / Plugin v1.3.0');
 
         return $barzahlenApi;
     }
 
     /**
-     * Redirect URL for checkouts using Barzahlen Payment Method - instead of onepage checkout success page.
+     * Send payment request after order (backend / frontend).
      *
-     * @return string with URL
+     * @param Varien_Object $payment
+     * @param float $amount
+     * @return $this|Mage_Payment_Model_Abstract
+     * @throws Mage_Core_Exception
      */
-    public function getOrderPlaceRedirectUrl()
+    public function order(Varien_Object $payment, $amount)
     {
-        return Mage::getUrl($this->_redirectProcessingUrl);
+        $order = $payment->getOrder();
+        $orderAddress = $order->getBillingAddress();
+
+        $bzPayment = Mage::getModel(
+            'barzahlen/api_request_payment',
+            array(
+                'customerEmail' => $order->getCustomerEmail(),
+                'customerStreetNr' => $orderAddress->getData("street"),
+                'customerZipcode' => $orderAddress->getData("postcode"),
+                'customerCity' => $orderAddress->getData("city"),
+                'customerCountry' => $orderAddress->getData("country_id"),
+                'orderId' => $order->getRealOrderId(),
+                'amount' => $amount,
+                'currency' => $order->getOrderCurrencyCode()
+            )
+        );
+
+        try {
+            $this->getBarzahlenApi()->handleRequest($bzPayment);
+            $payment->setAdditionalInformation('transaction_id', $bzPayment->getTransactionId())
+                    ->setTransactionId($bzPayment->getTransactionId())
+                    ->setIsTransactionClosed(0);
+            $session = Mage::getSingleton('checkout/session');
+            $session->setData('barzahlen_infotext', $bzPayment->getInfotext1());
+        } catch (Exception $e) {
+            Mage::helper('barzahlen')->bzLog($e);
+            Mage::throwException(Mage::helper('barzahlen')->__('bz_frnt_error'));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Sends resend request to Barzahlen and returns if request was successful.
+     *
+     * @param integer $transactionId Barzahlen Transaction ID
+     * @return boolean
+     */
+    public function resendSlip($transactionId)
+    {
+        $bzResend = Mage::getModel(
+            'barzahlen/api_request_resend',
+            array(
+                'transactionId' => $transactionId
+            )
+        );
+
+        try {
+            $this->getBarzahlenApi()->handleRequest($bzResend);
+        } catch (Exception $e) {
+            Mage::helper('barzahlen')->bzLog($e);
+        }
+
+        return $bzResend->isValid();
+    }
+
+    /**
+     * Trigger online refund action from admin panel.
+     *
+     * @param Varien_Object $payment
+     * @param float $amount
+     * @return $this|Mage_Payment_Model_Abstract
+     * @throws Mage_Core_Exception
+     */
+    public function refund(Varien_Object $payment, $amount)
+    {
+        $bzRefund = Mage::getModel(
+            'barzahlen/api_request_refund',
+            array(
+                'transactionId' => $payment->getAdditionalInformation('transaction_id'),
+                'amount' => $amount,
+                'currency' => $payment->getOrder()->getOrderCurrencyCode()
+            )
+        );
+
+        try {
+            $this->getBarzahlenApi()->handleRequest($bzRefund);
+            $payment->setTransactionId($bzRefund->getRefundTransactionId());
+        } catch (Exception $e) {
+            Mage::helper('barzahlen')->bzLog($e);
+            Mage::throwException(Mage::helper('barzahlen')->__('bz_adm_refund_error'));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Cancel payment slip after order cancellation.
+     *
+     * @param $data
+     */
+    public function cancelPaymentSlip($data)
+    {
+        $payment = $data->getOrder()->getPayment();
+
+        if ($payment->getMethod() != $this->_code) {
+            return;
+        }
+
+        $bzCancel = Mage::getModel(
+            'barzahlen/api_request_cancel',
+            array(
+                'transactionId' => $payment->getAdditionalInformation('transaction_id')
+            )
+        );
+
+        try {
+            $this->getBarzahlenApi()->handleRequest($bzCancel);
+        } catch (Exception $e) {
+            Mage::helper('barzahlen')->bzLog($e);
+        }
     }
 }

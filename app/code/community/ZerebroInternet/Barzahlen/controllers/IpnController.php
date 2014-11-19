@@ -1,30 +1,20 @@
 <?php
 /**
- * Barzahlen Payment Module
- *
- * NOTICE OF LICENSE
- *
- * This source file is subject to the Open Software License (OSL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to info@barzahlen.de so we can send you a copy immediately.
+ * Barzahlen Payment Module for Magento
  *
  * @category    ZerebroInternet
  * @package     ZerebroInternet_Barzahlen
- * @copyright   Copyright (c) 2013 Zerebro Internet GmbH (http://www.barzahlen.de)
- * @author      Martin Seener
+ * @copyright   Copyright (c) 2014 Cash Payment Solutions GmbH (https://www.barzahlen.de)
  * @author      Alexander Diebler
+ * @author      Martin Seener
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL-3.0)
  */
 
 class ZerebroInternet_Barzahlen_IpnController extends Mage_Core_Controller_Front_Action
 {
     /**
-     * Instantiate IPN model and pass IPN request to it. After successful hash validation HTTP header
-     * 200 is send first before the database is updated.
+     * Instantiate IPN model and pass IPN request to it. After successful hash validation and database update
+     * HTTP header 200 is send to confirm callback.
      */
     public function indexAction()
     {
@@ -32,16 +22,25 @@ class ZerebroInternet_Barzahlen_IpnController extends Mage_Core_Controller_Front
             $data = $this->getRequest()->getQuery();
             $ipnModel = Mage::getModel('barzahlen/ipn');
 
-            if ($ipnModel->sendResponseHeader($data)) {
-                header("HTTP/1.1 200 OK");
-                header("Status: 200 OK");
-                $ipnModel->updateDatabase();
+            if ($ipnModel->isDataValid($data) && $ipnModel->updateDatabase()) {
+                $this->returnHeader(200);
             } else {
-                header("HTTP/1.1 400 Bad Request");
-                header("Status: 400 Bad Request");
+                $this->returnHeader(400);
             }
         } catch (Exception $e) {
             Mage::logException($e);
+        }
+    }
+
+    protected function returnHeader($code)
+    {
+        if ($code == 200) {
+            header("HTTP/1.1 200 OK");
+            header("Status: 200 OK");
+        } else {
+            header("HTTP/1.1 400 Bad Request");
+            header("Status: 400 Bad Request");
+            die();
         }
     }
 }

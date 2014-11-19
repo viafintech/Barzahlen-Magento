@@ -1,21 +1,12 @@
 <?php
 /**
- * Barzahlen Payment Module SDK for Magento
- *
- * NOTICE OF LICENSE
- *
- * This source file is subject to the Open Software License (OSL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to info@barzahlen.de so we can send you a copy immediately.
+ * Barzahlen Payment Module for Magento
  *
  * @category    ZerebroInternet
  * @package     ZerebroInternet_Barzahlen
- * @copyright   Copyright (c) 2013 Zerebro Internet GmbH (http://www.barzahlen.de)
+ * @copyright   Copyright (c) 2014 Cash Payment Solutions GmbH (https://www.barzahlen.de)
  * @author      Alexander Diebler
+ * @author      Martin Seener
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL-3.0)
  */
 
@@ -27,6 +18,7 @@ class ZerebroInternet_Barzahlen_Model_Api extends ZerebroInternet_Barzahlen_Mode
     protected $_allowLanguages = array('de', 'en'); //!< allowed languages for requests
     protected $_sandbox = false; //!< sandbox settings
     protected $_madeAttempts = 0; //!< performed attempts
+    protected $_userAgent = 'PHP SDK v1.1.7';
 
     /**
      * Constructor. Sets basic settings. Adjusted for Magento
@@ -52,6 +44,16 @@ class ZerebroInternet_Barzahlen_Model_Api extends ZerebroInternet_Barzahlen_Mode
         } else {
             $this->_language = $this->_allowLanguages[0];
         }
+    }
+
+    /**
+     * Sets user agent
+     *
+     * @param string $userAgent used user agent
+     */
+    public function setUserAgent($userAgent)
+    {
+        $this->_userAgent = $userAgent;
     }
 
     /**
@@ -107,10 +109,11 @@ class ZerebroInternet_Barzahlen_Model_Api extends ZerebroInternet_Barzahlen_Mode
         curl_setopt($curl, CURLOPT_POST, count($requestArray));
         curl_setopt($curl, CURLOPT_POSTFIELDS, $requestArray);
         curl_setopt($curl, CURLOPT_HEADER, 0);
+        curl_setopt($curl, CURLOPT_USERAGENT, $this->_userAgent);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
-        curl_setopt($curl, CURLOPT_CAINFO, Mage::getRoot() . '/code/community/ZerebroInternet/Barzahlen/Model/Api/certs/ca-bundle.crt');
+        curl_setopt($curl, CURLOPT_CAINFO, dirname(__FILE__) . '/Api/certs/ca-bundle.crt');
         curl_setopt($curl, CURLOPT_TIMEOUT, 30);
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 15);
         curl_setopt($curl, CURLOPT_HTTP_VERSION, 1.1);
