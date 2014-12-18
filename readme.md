@@ -5,9 +5,12 @@ DE - https://integration.barzahlen.de/de/shopsysteme/magento/nutzerhandbuch
 EN - https://integration.barzahlen.de/en/shopsystems/magento/user-manual
 
 ## Current Version
-1.3.0
+1.3.1
 
 ## Changelog
+
+### 1.3.1 (18.12.2014)
+* bugfix to allow older transaction to expire on callback
 
 ### 1.3.0 (19.11.2014)
 * integrated Barzahlen transactions better with Magento transactions
