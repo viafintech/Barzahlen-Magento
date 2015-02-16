@@ -1,0 +1,7 @@
+app/code/community/ZerebroInternet/Barzahlen/ app/code/community/ZerebroInternet/Barzahlen/
+app/design/adminhtml/base/default/template/barzahlen/ app/design/adminhtml/base/default/template/barzahlen/
+app/design/adminhtml/default/default/template/barzahlen/ app/design/adminhtml/default/default/template/barzahlen/
+app/design/frontend/base/default/template/barzahlen/ app/design/frontend/base/default/template/barzahlen/
+app/etc/modules/ZerebroInternet_Barzahlen.xml app/etc/modules/ZerebroInternet_Barzahlen.xml
+app/locale/de_DE/ZerebroInternet_Barzahlen.csv app/locale/de_DE/ZerebroInternet_Barzahlen.csv
+app/locale/en_US/ZerebroInternet_Barzahlen.csv app/locale/en_US/ZerebroInternet_Barzahlen.csv
