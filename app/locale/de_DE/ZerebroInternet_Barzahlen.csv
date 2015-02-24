@@ -49,6 +49,7 @@
 "bz_adm_debug_comment","Aktivieren Sie Debugging für zusätzliches Logging."
 "bz_adm_refund_success", "Die Rückzahlung wurde erfolgreich angestoßen."
 "bz_adm_refund_error", "Es ist ein Fehler aufgetreten, die Rückzahlung konnte nicht veranlasst werden. Prüfen Sie barzahlen.log für weitere Informationen."
+"bz_adm_refund_declined", "Die Rückzahlung konnte nicht veranlasst werden. Der verfügbare Betrag für Rückzahlungen auf dem Barzahlen.de Händlerkonto reicht nicht aus."
 "bz_adm_resend_payment_success", "Der Zahlschein wurde erneut an den Kunden versendet."
 "bz_adm_resend_refund_success", "Der Auszahlschein wurde erneut an den Kunden versendet."
 "bz_adm_resend_error", "Es ist ein Fehler aufgetreten. Prüfen Sie barzahlen.log für weitere Informationen."

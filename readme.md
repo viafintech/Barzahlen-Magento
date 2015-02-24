@@ -5,9 +5,13 @@ DE - https://integration.barzahlen.de/de/shopsysteme/magento/nutzerhandbuch
 EN - https://integration.barzahlen.de/en/shopsystems/magento/user-manual
 
 ## Current Version
-1.3.2
+1.3.3
 
 ## Changelog
+
+### 1.3.3 (24.02.2015)
+* showing credit memo button only within invoice
+* improved error messages
 
 ### 1.3.2 (18.12.2014)
 * intern version number correction for Magento Connect
@@ -70,7 +74,7 @@ EN - https://integration.barzahlen.de/en/shopsystems/magento/user-manual
 The Barzahlen Team will happily assist you with any problems or questions. Send us an email to support@barzahlen.de or use the contact form at https://integration.barzahlen.de/en/support.
 
 ## Copyright
-(c) 2014, Cash Payment Solutions GmbH  
+(c) 2015, Cash Payment Solutions GmbH  
 https://www.barzahlen.de
 
 ## NOTICE OF LICENSE

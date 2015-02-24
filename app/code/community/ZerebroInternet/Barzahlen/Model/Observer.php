@@ -4,7 +4,7 @@
  *
  * @category    ZerebroInternet
  * @package     ZerebroInternet_Barzahlen
- * @copyright   Copyright (c) 2014 Cash Payment Solutions GmbH (https://www.barzahlen.de)
+ * @copyright   Copyright (c) 2015 Cash Payment Solutions GmbH (https://www.barzahlen.de)
  * @author      Alexander Diebler
  * @author      Martin Seener
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL-3.0)
@@ -20,6 +20,10 @@ class ZerebroInternet_Barzahlen_Model_Observer
         if($type == 'adminhtml/sales_order_view') {
             $order = $block->getOrder();
             $paymentMethod = $order->getPayment()->getMethod();
+
+            if ($paymentMethod == 'barzahlen') {
+                $block->removebutton('order_creditmemo');
+            }
 
             if ($order->getId() && $order->canInvoice() && $paymentMethod == 'barzahlen') {
                 $message = Mage::helper('sales')->__('bz_adm_resend_payment_slip_question');

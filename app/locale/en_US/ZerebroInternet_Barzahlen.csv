@@ -49,6 +49,7 @@
 "bz_adm_debug_comment","Activate debugging for additional logging."
 "bz_adm_refund_success", "The refund request was placed successful."
 "bz_adm_refund_error", "An error occurred, unable to create credit memo. Check barzahlen.log for further information."
+"bz_adm_refund_declined", "Unable to create credit memo. The amount available for refunds on the Barzahlen.de merchant account is not sufficient."
 "bz_adm_resend_payment_success", "The payment slip was resend successful."
 "bz_adm_resend_refund_success", "The refund slip was resend successful."
 "bz_adm_resend_error", "An error occurred. Please check barzahlen.log for further information."

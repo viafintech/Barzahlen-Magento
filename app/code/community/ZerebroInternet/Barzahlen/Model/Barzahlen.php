@@ -4,7 +4,7 @@
  *
  * @category    ZerebroInternet
  * @package     ZerebroInternet_Barzahlen
- * @copyright   Copyright (c) 2014 Cash Payment Solutions GmbH (https://www.barzahlen.de)
+ * @copyright   Copyright (c) 2015 Cash Payment Solutions GmbH (https://www.barzahlen.de)
  * @author      Alexander Diebler
  * @author      Martin Seener
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL-3.0)
@@ -161,7 +161,11 @@ class ZerebroInternet_Barzahlen_Model_Barzahlen extends Mage_Payment_Model_Metho
             $payment->setTransactionId($bzRefund->getRefundTransactionId());
         } catch (Exception $e) {
             Mage::helper('barzahlen')->bzLog($e);
-            Mage::throwException(Mage::helper('barzahlen')->__('bz_adm_refund_error'));
+            if (strpos($e->getMessage(), 'refund declined')) {
+                Mage::throwException(Mage::helper('barzahlen')->__('bz_adm_refund_declined'));
+            } else {
+                Mage::throwException(Mage::helper('barzahlen')->__('bz_adm_refund_error'));
+            }
         }
 
         return $this;
