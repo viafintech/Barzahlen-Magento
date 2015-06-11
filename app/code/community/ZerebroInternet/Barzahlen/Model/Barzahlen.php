@@ -66,7 +66,7 @@ class ZerebroInternet_Barzahlen_Model_Barzahlen extends Mage_Payment_Model_Metho
         $barzahlenApi = Mage::getModel('barzahlen/api', array('shopId' => $shopId, 'paymentKey' => $paymentKey, 'sandbox' => $sandbox));
         $barzahlenApi->setLanguage(substr((Mage::getSingleton('core/locale')->getLocaleCode()), 0, 2));
         $barzahlenApi->setDebug($this->getConfigData('debug'), 'barzahlen.log');
-        $barzahlenApi->setUserAgent('Magento ' . Mage::getVersion() . ' / Plugin v1.3.0');
+        $barzahlenApi->setUserAgent('Magento ' . Mage::getVersion() . ' / Plugin v1.3.4');
 
         return $barzahlenApi;
     }

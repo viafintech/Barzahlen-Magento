@@ -5,9 +5,13 @@ DE - https://integration.barzahlen.de/de/shopsysteme/magento/nutzerhandbuch
 EN - https://integration.barzahlen.de/en/shopsystems/magento/user-manual
 
 ## Current Version
-1.3.3
+1.3.4
 
 ## Changelog
+
+### 1.3.4 (11.06.2015)
+* improved payment selection
+* updated to Barzahlen PHP SDK v1.1.8
 
 ### 1.3.3 (24.02.2015)
 * showing credit memo button only within invoice

@@ -32,7 +32,7 @@ class ZerebroInternet_Barzahlen_Model_Api_Request_Payment extends ZerebroInterne
      */
     public function __construct(array $arguments)
     {
-        $this->_customerEmail = $arguments['customerEmail'];
+        $this->_customerEmail = $this->isoConvert($arguments['customerEmail']);
         $this->_customerStreetNr = $this->isoConvert($arguments['customerStreetNr']);
         $this->_customerZipcode = $arguments['customerZipcode'];
         $this->_customerCity = $this->isoConvert($arguments['customerCity']);
