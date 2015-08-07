@@ -15,7 +15,7 @@
 
     <modules>
         <ZerebroInternet_Barzahlen>
-            <version>1.3.4</version>
+            <version>1.3.5</version>
         </ZerebroInternet_Barzahlen>
     </modules>
 
@@ -88,6 +88,18 @@
             </modules>
         </translate>
     </frontend>
+
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <barzahlen before="Mage_Adminhtml">ZerebroInternet_Barzahlen_Adminhtml</barzahlen>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
 
     <adminhtml>
         <events>

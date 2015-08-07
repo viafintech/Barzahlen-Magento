@@ -10,7 +10,7 @@
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL-3.0)
  */
 
-class ZerebroInternet_Barzahlen_ResendController extends Mage_Adminhtml_Controller_Action
+class ZerebroInternet_Barzahlen_Adminhtml_ResendController extends Mage_Adminhtml_Controller_Action
 {
     /**
      * Handles payment slip resend requests.
@@ -37,9 +37,9 @@ class ZerebroInternet_Barzahlen_ResendController extends Mage_Adminhtml_Controll
     public function refundAction()
     {
         $id = $this->getRequest()->getParam('creditmemo_id');
-        $creditmemo = Mage::getModel('sales/order_creditmemo')->load($id);
+        $creditMemo = Mage::getModel('sales/order_creditmemo')->load($id);
 
-        $transactionId = $creditmemo->getTransactionId();
+        $transactionId = $creditMemo->getTransactionId();
 
         if (Mage::getSingleton('barzahlen/barzahlen')->resendSlip($transactionId)) {
             $this->_getSession()->addSuccess($this->__('bz_adm_resend_refund_success'));
@@ -49,4 +49,10 @@ class ZerebroInternet_Barzahlen_ResendController extends Mage_Adminhtml_Controll
 
         $this->_redirect('adminhtml/sales_order_creditmemo/view', array('creditmemo_id' => $id));
     }
+
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isAllowed('sales/order/barzahlen_actions');
+    }
+
 }

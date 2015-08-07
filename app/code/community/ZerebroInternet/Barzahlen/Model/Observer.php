@@ -17,7 +17,7 @@ class ZerebroInternet_Barzahlen_Model_Observer
         $block = $observer->getBlock();
         $type = $block->getType();
 
-        if($type == 'adminhtml/sales_order_view') {
+        if ($type == 'adminhtml/sales_order_view') {
             $order = $block->getOrder();
             $paymentMethod = $order->getPayment()->getMethod();
 
@@ -29,10 +29,10 @@ class ZerebroInternet_Barzahlen_Model_Observer
                 $message = Mage::helper('sales')->__('bz_adm_resend_payment_slip_question');
                 $block->addButton('payment_slip_resend', array(
                     'label' => Mage::helper('barzahlen')->__('bz_adm_resend_payment_slip'),
-                    'onclick' => "confirmSetLocation('{$message}', '{$block->getUrl('barzahlen/resend/payment', array('order_id' => $order->getId()))}')"
+                    'onclick' => "confirmSetLocation('{$message}', '{$block->getUrl('*/resend/payment', array('order_id' => $order->getId()))}')"
                 ), 0, 100, 'header');
             }
-        } elseif ($type == 'adminhtml/sales_order_creditmemo_view'){
+        } elseif ($type == 'adminhtml/sales_order_creditmemo_view') {
             $creditMemo = $block->getCreditmemo();
             $paymentMethod = $creditMemo->getOrder()->getPayment()->getMethod();
 
@@ -40,7 +40,7 @@ class ZerebroInternet_Barzahlen_Model_Observer
                 $message = Mage::helper('sales')->__('bz_adm_resend_refund_slip_question');
                 $block->addButton('refund_slip_resend', array(
                     'label' => Mage::helper('barzahlen')->__('bz_adm_resend_refund_slip'),
-                    'onclick' => "confirmSetLocation('{$message}', '{$block->getUrl('barzahlen/resend/refund', array('creditmemo_id' => $creditMemo->getId()))}')"
+                    'onclick' => "confirmSetLocation('{$message}', '{$block->getUrl('*/resend/refund', array('creditmemo_id' => $creditMemo->getId()))}')"
                 ), 0, 100, 'header');
             }
         }
